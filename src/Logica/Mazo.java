@@ -1,0 +1,51 @@
+package Logica;
+
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import javax.imageio.ImageIO;
+
+public class Mazo {
+
+    String palos[] = {"Treboles", "Diamantes", "Corazones", "Picas"};
+    ArrayList<Carta> cartasMazo;
+    BufferedImage imagenCartas;
+
+    public Mazo() {
+        try {
+            imagenCartas = ImageIO.read(new File("Cartas.png"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        generarMazo();
+        imprimirMazo();
+    }
+    public void generarMazo() {
+        cartasMazo = new ArrayList<>();
+        for (int i = 0; i < palos.length; i++) {
+            for (int j = 1; j <= 13; j++) {
+                int x = (j - 1) * 71;
+                int y = i * 95;
+
+                BufferedImage sprite = imagenCartas.getSubimage(x, y, 71, 95);
+                cartasMazo.add(new Carta(j, palos[i], sprite));
+            }
+        }
+    }
+
+    public void imprimirMazo() {
+        for (int i = 0; i < cartasMazo.size(); i++) {
+            cartasMazo.get(i).imprimirCarta();
+        }
+    }
+    public void barajarMazo() {
+        Collections.shuffle(cartasMazo);
+    }
+
+    public static void main(String[] args) {
+        Mazo mazo = new Mazo();
+        mazo.barajarMazo();
+        mazo.imprimirMazo();
+    }
+}
