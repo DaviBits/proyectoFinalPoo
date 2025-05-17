@@ -8,6 +8,11 @@ public class SevenCard extends Poker {
     }
 
     @Override
+    public void inicializarJugadores() {
+
+    }
+
+    @Override
     public void repartirCartas() {
 
     }

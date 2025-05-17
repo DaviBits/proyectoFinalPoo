@@ -3,6 +3,11 @@ package Logica;
 import java.util.ArrayList;
 
 public abstract class Jugador {
-    ArrayList<Carta> cartasBocaArriba;
-    ArrayList<Carta> cartasBocaAbajo;
+    public  ArrayList<Carta> mano;
+    public String nombre;
+
+    public ArrayList<Carta> getMano() {
+        return mano;
+    }
+
 }

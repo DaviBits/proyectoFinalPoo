@@ -18,7 +18,9 @@ public class Mazo {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         generarMazo();
+        barajarMazo();
         imprimirMazo();
     }
     public void generarMazo() {
@@ -48,4 +50,8 @@ public class Mazo {
         mazo.barajarMazo();
         mazo.imprimirMazo();
     }
+    public ArrayList<Carta> getCartasMazo() {
+        return cartasMazo;
+    }
+
 }
