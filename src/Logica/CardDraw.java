@@ -17,7 +17,7 @@ public class CardDraw extends Poker {
 
     public CardDraw() {
         Mazo mazo = new Mazo();
-        inicializarJugadores();
+        inicializarJugadores(); 
 
         setLayout(null);
 
