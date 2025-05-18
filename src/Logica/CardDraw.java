@@ -138,7 +138,7 @@ public class CardDraw extends Poker {
         });
     }
 
-    @Override
+
     public void repartirCartas() {
         JLabel textoRepartirCartas = new JLabel("Repartir Cartas?");
         textoRepartirCartas.setFont(new Font("Comic Sans MS", Font.BOLD, 14));
@@ -155,9 +155,8 @@ public class CardDraw extends Poker {
 
             for (int i = 0; i < cartasPorJugador; i++) {
                 for (int j = 0; j < numJugadores; j++) {
-                    Carta carta = mazo.getCartasMazo().get(indiceCarta);
-                    jugadores.get(j).getMano().add(carta);
-                    indiceCarta++;
+                   Carta carta = tomarCarta();
+                   jugadores.get(j).getMano().add(carta);
                 }
             }
             btnRepartirCartas.setVisible(false);

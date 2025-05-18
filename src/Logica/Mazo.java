@@ -8,9 +8,9 @@ import javax.imageio.ImageIO;
 
 public class Mazo {
 
-    String[] palos = { "Corazones", "Treboles", "Diamantes", "Picas" }; // Orden del sprite
-    ArrayList<Carta> cartasMazo;
-    BufferedImage imagenCartas;
+    private String[] palos = { "Corazones", "Treboles", "Diamantes", "Picas" }; // Orden del sprite
+    private ArrayList<Carta> cartasMazo;
+    private BufferedImage imagenCartas;
 
     public Mazo() {
         try {
@@ -58,5 +58,11 @@ public class Mazo {
     public ArrayList<Carta> getCartasMazo() {
         return cartasMazo;
     }
+
+    public Carta getCartaEn(int n){return cartasMazo.get(n);}
+
+    public int getTamañoDellMazo(){return cartasMazo.size();}
+
+    public void eliminarCarta(Carta carta){cartasMazo.remove(carta);}
 
 }
