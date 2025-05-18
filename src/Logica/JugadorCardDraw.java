@@ -2,11 +2,12 @@ package Logica;
 
 import java.util.ArrayList;
 
-public class JugadorCardDraw extends Jugador {
+public class JugadorCardDraw {
 
     public int fichas = 1000;
     public int apuesta = 0;
     public boolean noAposto;
+    private ArrayList<Carta> mano = new ArrayList<>();
     public JugadorCardDraw() {
         mano = new ArrayList<>();
     }

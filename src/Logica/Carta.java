@@ -33,7 +33,7 @@ public class Carta {
         return valor;
     }
 
-    public String getPaloCarta() {
+    public String getPalo() {
         return palo;
     }
 
@@ -54,7 +54,7 @@ public class Carta {
     public BufferedImage getImagen() {
         return cartaBocaAbajo ? imagenReverso : imagen;
     }
-
+    public int getValor(){return valor;}
     public void setImagen(BufferedImage imagen) {
         this.imagen = imagen;
     }
