@@ -9,8 +9,8 @@ public class Main {
         Mazo mazo = new Mazo();
         JPanel panelCartas = new JPanel();
         panelCartas.setLayout(new BoxLayout(panelCartas, BoxLayout.Y_AXIS));
-        for (int i = 0; i < mazo.cartasMazo.size(); i++) {
-            JLabel cartaLabel = new JLabel(new ImageIcon(mazo.cartasMazo.get(i).getImagen()));
+        for (int i = 0; i < mazo.getTamañoDellMazo(); i++) {
+            JLabel cartaLabel = new JLabel(new ImageIcon(mazo.getCartaEn(i).getImagen()));
             cartaLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             panelCartas.add(cartaLabel);
             panelCartas.add(Box.createRigidArea(new Dimension(0, 5)));
