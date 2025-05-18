@@ -2,6 +2,7 @@ package Logica;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 public class CardDraw extends Poker {
@@ -14,6 +15,7 @@ public class CardDraw extends Poker {
     private boolean mostrarCartas = false;
     private JButton btnCheck;
     private JButton btnBet;
+    private ArrayList<JButton> botonesCartas = new ArrayList<>();
 
     public CardDraw() {
         Mazo mazo = new Mazo();
@@ -27,18 +29,56 @@ public class CardDraw extends Poker {
         turnoActual.setVisible(false); // No visible hasta que inicie algo
         add(turnoActual);
     }
+    private void mostrarCartasComoBotones(int indiceJugador) {
+        // Eliminar botones anteriores
+        for (JButton btn : botonesCartas) {
+            remove(btn);
+        }
+        botonesCartas.clear();
 
-    private void dibujarCartas(Graphics g, int indiceJugador) {
         ArrayList<Carta> mano = jugadores.get(indiceJugador).getMano();
         int x = 244;
         int y = 240;
         int espacio = 60;
 
         for (int i = 0; i < mano.size(); i++) {
-            Image img = mano.get(i).getImagen().getScaledInstance(100, 140, Image.SCALE_SMOOTH);
-            g.drawImage(img, x + i * espacio, y, null);
+            Carta carta = mano.get(i);
+
+            BufferedImage imagenCarta;
+            if (carta.getCartaBocaAbajo()) {
+                try {
+                    imagenCarta = javax.imageio.ImageIO.read(new java.io.File("cartaDeEspalda.png"));
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    continue; // no mostramos la carta si falla la imagen
+                }
+            } else {
+                imagenCarta = carta.getImagen();
+            }
+
+            Image imgEscalada = imagenCarta.getScaledInstance(100, 140, Image.SCALE_SMOOTH);
+            JButton btnCarta = new JButton(new ImageIcon(imgEscalada));
+            btnCarta.setBounds(x + i * espacio, y, 100, 140);
+            btnCarta.setBorder(null);
+            btnCarta.setContentAreaFilled(false);
+
+            if (!carta.getCartaBocaAbajo()) {
+                btnCarta.addActionListener(e -> {
+                    System.out.println("Carta seleccionada: " + carta.getValorCarta() + " de " + carta.getPaloCarta());
+                    // lógica adicional si se requiere
+                });
+            } else {
+                btnCarta.setEnabled(false); // opcional: no clickeable si está boca abajo
+            }
+
+            botonesCartas.add(btnCarta);
+            add(btnCarta);
         }
+
+        revalidate();
+        repaint();
     }
+
 
     @Override
     public void inicializarJugadores() {
@@ -135,14 +175,11 @@ public class CardDraw extends Poker {
         super.paintComponent(g);
         g.setFont(new Font("Comic Sans MS", Font.BOLD, 16));
 
-        if (mostrarCartas && !jugadores.isEmpty()) {
-            dibujarCartas(g, jugadorActual);
-        }
     }
 
     public void mostrarCartasJugadorActual() {
         mostrarCartas = true;
-        repaint();
+        mostrarCartasComoBotones(jugadorActual);
     }
 
     // AVANZAR JUGADOR: cambia jugadorActual, actualiza el texto y repinta
@@ -281,10 +318,11 @@ public class CardDraw extends Poker {
                 carta.setCartaBocaAbajo(!actualmenteBocaAbajo);
             }
 
-            repaint();
+            mostrarCartasComoBotones(jugadorActual); // actualizar la vista
         });
 
-        JButton izquierda = new JButton("<--");
+
+       /* JButton izquierda = new JButton("<--");
         izquierda.setFont(new Font("Comic Sans MS", Font.BOLD, 14));
         izquierda.setBounds(0, 300, 100, 20);
         add(izquierda);
@@ -294,20 +332,49 @@ public class CardDraw extends Poker {
                 jugadorActual = jugadores.size() - 1;
             }
             mostrarTurnoActual();
+            mostrarCartasComoBotones(jugadorActual);
             repaint();
-        });
+        });*/
 
-        JButton derecha = new JButton("-->");
+        JButton derecha = new JButton("Jugar Mano");
         derecha.setFont(new Font("Comic Sans MS", Font.BOLD, 14));
         derecha.setBounds(600, 300, 100, 20);
         add(derecha);
+
         derecha.addActionListener(e -> {
             jugadorActual++;
+
             if (jugadorActual >= jugadores.size()) {
+                // ✅ Todos jugaron su mano
+
+                // 🧹 Ocultar y limpiar botones de cartas
+                for (JButton btn : botonesCartas) {
+                    btn.setVisible(false);
+                    remove(btn);
+                }
+                botonesCartas.clear();
+
+                voltearCartas.setVisible(false);
+                remove(voltearCartas);
+                derecha.setVisible(false);
+                remove(derecha);
+
+                // 🕹️ Reiniciar al primer jugador
                 jugadorActual = 0;
+
+                // 💰 Iniciar nueva ronda de apuestas
+                empezarApuestas();
+            } else {
+                // 🔁 Todavía hay jugadores que no han jugado
+
+                mostrarTurnoActual();
+                mostrarCartasComoBotones(jugadorActual);
             }
-            mostrarTurnoActual();
+
+            revalidate();
             repaint();
         });
+
+
     }
 }

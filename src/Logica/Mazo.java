@@ -8,7 +8,7 @@ import javax.imageio.ImageIO;
 
 public class Mazo {
 
-    String palos[] = {"Treboles", "Diamantes", "Corazones", "Picas"};
+    String[] palos = { "Corazones", "Treboles", "Diamantes", "Picas" }; // Orden del sprite
     ArrayList<Carta> cartasMazo;
     BufferedImage imagenCartas;
 
@@ -26,15 +26,20 @@ public class Mazo {
     public void generarMazo() {
         cartasMazo = new ArrayList<>();
         for (int i = 0; i < palos.length; i++) {
-            for (int j = 1; j <= 13; j++) {
-                int x = (j - 1) * 71;
+            for (int j = 0; j < 13; j++) {
+                int x = j * 71;
                 int y = i * 95;
 
                 BufferedImage sprite = imagenCartas.getSubimage(x, y, 71, 95);
-                cartasMazo.add(new Carta(j, palos[i], sprite));
+
+                int valorReal = j + 2;
+                if (valorReal > 13) valorReal = 1; // A es valor 1
+
+                cartasMazo.add(new Carta(valorReal, palos[i], sprite));
             }
         }
     }
+
 
     public void imprimirMazo() {
         for (int i = 0; i < cartasMazo.size(); i++) {
