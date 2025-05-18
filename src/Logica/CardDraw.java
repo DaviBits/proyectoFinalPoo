@@ -284,10 +284,7 @@ public class CardDraw extends Poker {
         mostrarCartasJugadorActual();
     }
 
-    @Override
-    public void comenzarEnfrentamiento() {
-        // Implementación pendiente
-    }
+
 
     public static void main(String[] args) {
         JFrame frame = new JFrame("Ejemplo de JPanel");

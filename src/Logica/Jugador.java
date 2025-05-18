@@ -11,8 +11,15 @@ public class Jugador {
     public Jugador(String nombre, ArrayList<Carta> mano, int fichas){
         this.nombre=nombre;
         this.mano=mano;
-        this.fichas=0;
+        this.fichas=fichas;
     }
+    public Jugador(){
+
+    }
+
+    public void setNombre(String nombre){this.nombre=nombre;}
+    public void setMano(ArrayList<Carta> mano){this.mano=mano;}
+    public void setFichas(int fichas){this.fichas=fichas;}
 
     public int getFichas(){return fichas;}
     public void restarFichas(int fichasARestar){this.fichas-=fichasARestar;}
