@@ -64,7 +64,7 @@ public class CardDraw extends Poker {
 
             if (!carta.getCartaBocaAbajo()) {
                 btnCarta.addActionListener(e -> {
-                    System.out.println("Carta seleccionada: " + carta.getValorCarta() + " de " + carta.getPaloCarta());
+                    System.out.println("Carta seleccionada: " + carta.getValorCarta() + " de " + carta.getPalo());
                     // lógica adicional si se requiere
                 });
             } else {

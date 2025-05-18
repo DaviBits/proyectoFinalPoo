@@ -12,6 +12,9 @@ public class JugadorCardDraw {
         mano = new ArrayList<>();
     }
 
+    public ArrayList<Carta> getMano(){return mano;}
+
+
     public int apostarFichas(int apuesta) {
         this.fichas -= apuesta;
         this.apuesta = apuesta;
