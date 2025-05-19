@@ -4,7 +4,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.Collections;
 
 public class CardDraw extends Poker {
 
@@ -14,19 +13,35 @@ public class CardDraw extends Poker {
     private int apuestaTotal = 0;
     private JLabel jugadorEnPantalla = new JLabel();
     private JLabel textoApuestas = new JLabel("Ronda de Apuestas");
-    private JLabel ApuestaActual = new JLabel();
     private Mazo mazo = new Mazo();
     private JLabel labelApuestaMayor = new JLabel();
     private JLabel labelApuestaTotal = new JLabel();
-
+    private boolean segundaRondaDeApuesta = false;
     public CardDraw() {
         inicializarJugadores();
+        mostrarInfoApuestas();
     }
     private void mostrarJugadorActual() {
         jugadorEnPantalla.setBounds(300, 0, 300, 20);
         jugadorEnPantalla.setFont(new Font("Comic Sans MS", Font.BOLD, 14));
         jugadorEnPantalla.setVisible(true);
         add(jugadorEnPantalla);
+    }
+    private void mostrarInfoApuestas() {
+        labelApuestaMayor.setBounds(600, 10, 200, 20);
+        labelApuestaMayor.setFont(new Font("Comic Sans MS", Font.BOLD, 14));
+        labelApuestaMayor.setText("Apuesta mayor: $" + apuestaMayor);
+        add(labelApuestaMayor);
+
+        labelApuestaTotal.setBounds(600, 40, 200, 20);
+        labelApuestaTotal.setFont(new Font("Comic Sans MS", Font.BOLD, 14));
+        labelApuestaTotal.setText("Pozo total: $" + apuestaTotal);
+        add(labelApuestaTotal);
+    }
+
+    private void actualizarInfoApuestas() {
+        labelApuestaMayor.setText("Apuesta mayor: $" + apuestaMayor);
+        labelApuestaTotal.setText("Pozo total: $" + apuestaTotal);
     }
 
     private void actualizarTurno() {
@@ -110,8 +125,7 @@ public class CardDraw extends Poker {
 
     @Override
     public void empezarApuestas() {
-
-
+        mostrarInfoApuestas();
         remove(textoApuestas);
         textoApuestas.setBounds(10, 10, 300, 20);
         textoApuestas.setFont(new Font("Comic Sans MS", Font.BOLD, 14));
@@ -145,8 +159,12 @@ public class CardDraw extends Poker {
                 ocultarMenuApuestas();
 
                 JOptionPane.showMessageDialog(this, "Todos pasaron. Fin de la ronda de apuestas.");
-                comenzarDescarte();
-
+                if(segundaRondaDeApuesta == true){
+                    comenzarEnfrentamiento();
+                }
+                else if(segundaRondaDeApuesta == false) {
+                    comenzarDescarte();
+                }
                 revalidate();
                 repaint();
             }else {
@@ -158,9 +176,16 @@ public class CardDraw extends Poker {
     private void insertarApuestaMayor() {
         removeAll();
 
+        // Regresa todo lo necesario
+        mostrarInfoApuestas();
+        actualizarInfoApuestas();
+
         mostrarJugadorActual();
         actualizarTurno();
 
+        add(textoApuestas);
+
+        // --- Componentes específicos de esta pantalla ---
         JLabel label = new JLabel("Jugador " + (jugadorActual + 1) + ", ingrese su apuesta mayor:");
         label.setBounds(10, 50, 400, 25);
         add(label);
@@ -182,7 +207,8 @@ public class CardDraw extends Poker {
                 }
 
                 apuestaMayor = cantidad;
-                apuestaTotal+=cantidad;
+                apuestaTotal += cantidad;
+                actualizarInfoApuestas();
                 jugadores.get(jugadorActual).setApuestaHecha(true);
 
                 siguienteJugadorApuesta();
@@ -196,10 +222,16 @@ public class CardDraw extends Poker {
         repaint();
     }
 
+
     private void elegirSubirIgualarRetirarse() {
         removeAll();
+
+        mostrarInfoApuestas();
+        actualizarInfoApuestas();
         mostrarJugadorActual();
         actualizarTurno();
+
+        add(textoApuestas); // <- importante si lo quieres presente
 
         JLabel texto = new JLabel("Jugador " + (jugadorActual + 1) + ", decide:");
         texto.setBounds(10, 50, 300, 25);
@@ -221,16 +253,16 @@ public class CardDraw extends Poker {
 
         btnIgualar.addActionListener(e -> {
             jugadores.get(jugadorActual).setApuestaHecha(true);
-            apuestaTotal+=apuestaMayor;
+            apuestaTotal += apuestaMayor;
+            actualizarInfoApuestas();
             siguienteJugadorApuesta();
         });
 
         btnRetirarse.addActionListener(e -> {
             jugadores.remove(jugadorActual);
             if (jugadores.size() <= 1) {
-                JOptionPane.showMessageDialog(this, "Fin de ronda, solo queda un jugador.");
-                comenzarDescarte();
-                return;
+                JOptionPane.showMessageDialog(this, "Solo queda un jugador se acaba el juego.");
+
             }
             if (jugadorActual >= jugadores.size()) jugadorActual = 0;
             siguienteJugadorApuesta();
@@ -239,6 +271,7 @@ public class CardDraw extends Poker {
         revalidate();
         repaint();
     }
+
     private void ocultarMenuApuestas() {
         removeAll();
         revalidate();
@@ -250,7 +283,13 @@ public class CardDraw extends Poker {
         if (siguiente == -1) {
             JOptionPane.showMessageDialog(this, "Fin de la ronda de apuestas.");
             ocultarMenuApuestas();
-            comenzarDescarte();
+            if(!segundaRondaDeApuesta) {
+                comenzarDescarte();
+            }
+            else if(segundaRondaDeApuesta) {
+                comenzarEnfrentamiento();
+            }
+
 
         } else {
             jugadorActual = siguiente;
@@ -276,17 +315,11 @@ public class CardDraw extends Poker {
         JugadorCardDraw jugador = jugadores.get(jugadorActual);
         ArrayList<Carta> mano = jugador.getMano();
 
-        // Guardamos estado boca abajo (si toda la mano está igual, tomamos la primera como referencia)
-
         for (int i = 0; i < mano.size(); i++) {
             Carta carta = mano.get(i);
-
             if (carta.getCartaSeleccionada()) {
-                // Devolver al mazo la carta descartada
                 mazo.getCartasMazo().add(carta);
-
                 mazo.barajarMazo();
-                // Sacar nueva carta del mazo
                 if (!mazo.getCartasMazo().isEmpty()) {
                     Carta nuevaCarta = mazo.getCartasMazo().remove(0);
                     nuevaCarta.setCartaSeleccionada(false); // Por seguridad
@@ -301,10 +334,10 @@ public class CardDraw extends Poker {
     public void menuMostrarCartasDescarte() {
         removeAll();
 
-        JLabel labelJugador = new JLabel("Jugador " + (jugadorActual + 1) + " - Tus cartas:");
-        labelJugador.setBounds(10, 10, 300, 25);
-        labelJugador.setFont(new Font("Comic Sans MS", Font.BOLD, 14));
-        add(labelJugador);
+        mostrarInfoApuestas();
+        actualizarInfoApuestas();
+        mostrarJugadorActual();
+        actualizarTurno();
 
         ArrayList<Carta> mano = jugadores.get(jugadorActual).getMano();
 
@@ -320,9 +353,49 @@ public class CardDraw extends Poker {
         add(btnContinuar);
 
         btnContinuar.addActionListener(e -> {
+            jugadores.get(jugadorActual).setDescarteHecho(true); // Por si acaso, marcar descarte actual
+
             jugadorActual++;
-            menuMostrarCartasDescarte(); // Mostrar siguiente jugador
+
+            if (jugadorActual >= jugadores.size()) {
+                boolean todosDescartaron = true;
+                for (JugadorCardDraw j : jugadores) {
+                    if (!j.getDescarteHecho()) {
+                        todosDescartaron = false;
+                        break;
+                    }
+                }
+
+                if (todosDescartaron) {
+                    JOptionPane.showMessageDialog(this, "Todos han terminado de descartar. Comienza la ronda final de apuestas.");
+                    segundaRondaDeApuesta = true; // Marca como verdadera la seunda ronda de apuestas.
+                    // Resetea las apuestas hechas para que vuelvan a apostar
+                    for (JugadorCardDraw j : jugadores) {
+                        j.setApuestaHecha(false);
+                    }
+                    jugadorActual = 0;
+                    if(apuestaTotal == 0){
+                        removeAll();
+                        empezarApuestas();
+
+                    }
+                    else {
+                        removeAll();
+
+                        elegirSubirIgualarRetirarse();
+                    }
+
+
+                }
+                else {
+                    jugadorActual = 0; // Reiniciar para mostrar a los que no han descartado aún
+                    menuMostrarCartasDescarte();
+                }
+            } else {
+                menuMostrarCartasDescarte();
+            }
         });
+
 
         btnDescartarCartas.addActionListener(e -> {
             descartarYReponerCartas();
@@ -387,7 +460,7 @@ public class CardDraw extends Poker {
     }
 
     public void comenzarEnfrentamiento() {
-
+        JOptionPane.showMessageDialog(this, "ENFRETAMIENTO");
     }
 
     public static void main(String[] args) {
