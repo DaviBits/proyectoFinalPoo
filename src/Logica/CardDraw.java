@@ -4,87 +4,41 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class CardDraw extends Poker {
 
     private ArrayList<JugadorCardDraw> jugadores = new ArrayList<>();
-    public int jugadorActual = 0;
-    public int apuestaMayor = 0;
-    public JLabel turnoActual = new JLabel();
-    boolean apuestasTerminadas = false;
-    private boolean mostrarCartas = false;
-    private JButton btnCheck;
-    private JButton btnBet;
-    private ArrayList<JButton> botonesCartas = new ArrayList<>();
+    private int jugadorActual = 0;
+    private int apuestaMayor = 0;
+    private int apuestaTotal = 0;
+    private JLabel jugadorEnPantalla = new JLabel();
+    private JLabel textoApuestas = new JLabel("Ronda de Apuestas");
+    private JLabel ApuestaActual = new JLabel();
+    private Mazo mazo = new Mazo();
+    private JLabel labelApuestaMayor = new JLabel();
+    private JLabel labelApuestaTotal = new JLabel();
 
     public CardDraw() {
-        Mazo mazo = new Mazo();
-        inicializarJugadores(); 
-
-        setLayout(null);
-
-        // Configuración del JLabel para mostrar el turno
-        turnoActual.setBounds(10, 400, 200, 20);
-        turnoActual.setFont(new Font("Comic Sans MS", Font.BOLD, 14));
-        turnoActual.setVisible(false); // No visible hasta que inicie algo
-        add(turnoActual);
+        inicializarJugadores();
     }
-    private void mostrarCartasComoBotones(int indiceJugador) {
-        // Eliminar botones anteriores
-        for (JButton btn : botonesCartas) {
-            remove(btn);
-        }
-        botonesCartas.clear();
-
-        ArrayList<Carta> mano = jugadores.get(indiceJugador).getMano();
-        int x = 244;
-        int y = 240;
-        int espacio = 60;
-
-        for (int i = 0; i < mano.size(); i++) {
-            Carta carta = mano.get(i);
-
-            BufferedImage imagenCarta;
-            if (carta.getCartaBocaAbajo()) {
-                try {
-                    imagenCarta = javax.imageio.ImageIO.read(new java.io.File("cartaDeEspalda.png"));
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    continue; // no mostramos la carta si falla la imagen
-                }
-            } else {
-                imagenCarta = carta.getImagen();
-            }
-
-            Image imgEscalada = imagenCarta.getScaledInstance(100, 140, Image.SCALE_SMOOTH);
-            JButton btnCarta = new JButton(new ImageIcon(imgEscalada));
-            btnCarta.setBounds(x + i * espacio, y, 100, 140);
-            btnCarta.setBorder(null);
-            btnCarta.setContentAreaFilled(false);
-
-            if (!carta.getCartaBocaAbajo()) {
-                btnCarta.addActionListener(e -> {
-                    System.out.println("Carta seleccionada: " + carta.getValorCarta() + " de " + carta.getPaloCarta());
-                    // lógica adicional si se requiere
-                });
-            } else {
-                btnCarta.setEnabled(false); // opcional: no clickeable si está boca abajo
-            }
-
-            botonesCartas.add(btnCarta);
-            add(btnCarta);
-        }
-
-        revalidate();
-        repaint();
+    private void mostrarJugadorActual() {
+        jugadorEnPantalla.setBounds(300, 0, 300, 20);
+        jugadorEnPantalla.setFont(new Font("Comic Sans MS", Font.BOLD, 14));
+        jugadorEnPantalla.setVisible(true);
+        add(jugadorEnPantalla);
     }
 
+    private void actualizarTurno() {
+        jugadorEnPantalla.setText("Turno de Jugador: " + (jugadorActual + 1));
+    }
 
     @Override
     public void inicializarJugadores() {
         setLayout(null);
-        JLabel labelJugadores = new JLabel("Cuantos jugadores desea?");
-        labelJugadores.setBounds(10, 10, 200, 20);
+
+        JLabel labelJugadores = new JLabel("¿Cuántos jugadores desea?");
+        labelJugadores.setBounds(10, 10, 300, 20);
         labelJugadores.setFont(new Font("Comic Sans MS", Font.BOLD, 14));
         add(labelJugadores);
 
@@ -100,36 +54,23 @@ public class CardDraw extends Poker {
         add(comboBox);
 
         comboBox.addActionListener(e -> {
-            String seleccion = (String) comboBox.getSelectedItem();
-            switch (seleccion) {
-                case "2 jugadores":
-                    numJugadores = 2;
-                    break;
-                case "3 jugadores":
-                    numJugadores = 3;
-                    break;
-                case "4 jugadores":
-                    numJugadores = 4;
-                    break;
-                case "5 jugadores":
-                    numJugadores = 5;
-                    break;
-                default:
-                    numJugadores = 0;
+            switch ((String) comboBox.getSelectedItem()) {
+                case "2 jugadores" -> numJugadores = 2;
+                case "3 jugadores" -> numJugadores = 3;
+                case "4 jugadores" -> numJugadores = 4;
+                case "5 jugadores" -> numJugadores = 5;
             }
             botonAceptar.setVisible(true);
-            repaint();
         });
 
         botonAceptar.addActionListener(e -> {
-            // Crear jugadores
             for (int i = 0; i < numJugadores; i++) {
                 jugadores.add(new JugadorCardDraw());
             }
 
-            botonAceptar.setVisible(false);
-            comboBox.setVisible(false);
-            labelJugadores.setVisible(false);
+            remove(comboBox);
+            remove(botonAceptar);
+            remove(labelJugadores);
 
             repartirCartas();
 
@@ -140,28 +81,27 @@ public class CardDraw extends Poker {
 
     @Override
     public void repartirCartas() {
-        JLabel textoRepartirCartas = new JLabel("Repartir Cartas?");
-        textoRepartirCartas.setFont(new Font("Comic Sans MS", Font.BOLD, 14));
-        textoRepartirCartas.setBounds(10, 10, 300, 20);
-        add(textoRepartirCartas);
+        JLabel textoRepartir = new JLabel("¿Repartir cartas?");
+        textoRepartir.setFont(new Font("Comic Sans MS", Font.BOLD, 14));
+        textoRepartir.setBounds(10, 10, 300, 20);
+        add(textoRepartir);
 
-        JButton btnRepartirCartas = new JButton("Si, repartir Cartas");
-        btnRepartirCartas.setBounds(10, 100, 200, 20);
-        add(btnRepartirCartas);
+        JButton btnRepartir = new JButton("Sí, repartir");
+        btnRepartir.setBounds(10, 100, 200, 20);
+        add(btnRepartir);
 
-        btnRepartirCartas.addActionListener(e -> {
+        btnRepartir.addActionListener(e -> {
             int cartasPorJugador = 5;
-            int indiceCarta = 0;
+            int index = 0;
 
             for (int i = 0; i < cartasPorJugador; i++) {
-                for (int j = 0; j < numJugadores; j++) {
-                    Carta carta = mazo.getCartasMazo().get(indiceCarta);
-                    jugadores.get(j).getMano().add(carta);
-                    indiceCarta++;
+                for (JugadorCardDraw jugador : jugadores) {
+                    jugador.getMano().add(mazo.getCartasMazo().get(index++));
                 }
             }
-            btnRepartirCartas.setVisible(false);
-            textoRepartirCartas.setVisible(false);
+
+            remove(btnRepartir);
+            remove(textoRepartir);
 
             empezarApuestas();
 
@@ -171,210 +111,295 @@ public class CardDraw extends Poker {
     }
 
     @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        g.setFont(new Font("Comic Sans MS", Font.BOLD, 16));
-
-    }
-
-    public void mostrarCartasJugadorActual() {
-        mostrarCartas = true;
-        mostrarCartasComoBotones(jugadorActual);
-    }
-
-    // AVANZAR JUGADOR: cambia jugadorActual, actualiza el texto y repinta
-    private void avanzarJugador() {
-        jugadorActual++;
-        if (jugadorActual >= jugadores.size()) {
-            jugadorActual = 0;
-        }
-        mostrarTurnoActual();
-        repaint();
-    }
-
-    private void mostrarTurnoActual() {
-        turnoActual.setText("Turno Actual: " + (jugadorActual + 1));
-        turnoActual.setVisible(true);
-    }
-
-    @Override
     public void empezarApuestas() {
-        mostrarTurnoActual();
 
-        JLabel textoApuestas = new JLabel("Ronda de apuestas");
-        textoApuestas.setFont(new Font("Comic Sans MS", Font.BOLD, 14));
+
+        remove(textoApuestas);
         textoApuestas.setBounds(10, 10, 300, 20);
+        textoApuestas.setFont(new Font("Comic Sans MS", Font.BOLD, 14));
         add(textoApuestas);
 
-        btnCheck = new JButton("CHECK");
-        btnCheck.setBounds(200, 10, 200, 20);
-        btnCheck.setFont(new Font("Comic Sans MS", Font.BOLD, 14));
-        add(btnCheck);
+        mostrarJugadorActual();
+        actualizarTurno();
 
-        btnBet = new JButton("BET");
-        btnBet.setBounds(200, 30, 200, 20);
-        btnBet.setFont(new Font("Comic Sans MS", Font.BOLD, 14));
-        add(btnBet);
+        JButton btnApostar = new JButton("Apostar");
+        JButton btnPasar = new JButton("Pasar");
 
-        btnCheck.addActionListener(e -> {
-            jugadores.get(jugadorActual).setNoAposto(true);
-            avanzarJugador();
+        btnApostar.setBounds(10, 100, 200, 20);
+        btnPasar.setBounds(220, 100, 200, 20);
 
-            if (saberSiNadieAposto()) {
-                apuestasTerminadas = true;
+        add(btnApostar);
+        add(btnPasar);
 
-                btnCheck.setVisible(false);
-                btnBet.setVisible(false);
-                turnoActual.setVisible(false);
-                textoApuestas.setVisible(false);
-
-
-                revalidate();
-                repaint();
-
-                comenzarDescarte();
-            }
+        btnApostar.addActionListener(e -> {
+            remove(btnApostar);
+            remove(btnPasar);
+            insertarApuestaMayor();
         });
 
-        btnBet.addActionListener(e -> {
-            btnCheck.setVisible(false); // Si apostó, ya no puede hacer check
-
-            JTextField campoNumero = new JTextField();
-            campoNumero.setBounds(10, 160, 100, 25);
-            add(campoNumero);
-
-            JButton btnLeerApuesta = new JButton("Aceptar");
-            btnLeerApuesta.setBounds(120, 160, 100, 25);
-            add(btnLeerApuesta);
-
-            btnLeerApuesta.addActionListener(ev -> {
-                try {
-                    int numero = Integer.parseInt(campoNumero.getText());
-                    apuestaMayor = numero;
-                    jugadores.get(jugadorActual).setNoAposto(false);
-
-                    avanzarJugador();
-
-                    campoNumero.setVisible(false);
-                    btnLeerApuesta.setVisible(false);
-
-                    revalidate();
-                    repaint();
-
-                } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(this, "Por favor ingresa un número válido.");
-                }
-            });
-
-            repaint();
-        });
-    }
-
-    public boolean saberSiNadieAposto() {
-        for (JugadorCardDraw jugador : jugadores) {
-            if (!jugador.noAposto) {
-                return false; // Alguien sí apostó
-            }
-        }
-        return true; // Todos tienen noAposto = true
-    }
-
-    public void comenzarDescarte() {
-        mostrarTurnoActual();
-        menuVerMano();
-        mostrarCartasJugadorActual();
-    }
-
-    @Override
-    public void comenzarEnfrentamiento() {
-        // Implementación pendiente
-    }
-
-    public static void main(String[] args) {
-        JFrame frame = new JFrame("Ejemplo de JPanel");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(720, 480);
-        CardDraw panel = new CardDraw();
-        frame.add(panel);
-        frame.setVisible(true);
-    }
-
-    public void menuVerMano() {
-        turnoActual.setVisible(true);
-        mostrarTurnoActual();
-
-        JButton voltearCartas = new JButton("Voltear Cartas");
-        voltearCartas.setFont(new Font("Comic Sans MS", Font.BOLD, 14));
-        voltearCartas.setBounds(10, 100, 200, 20);
-        add(voltearCartas);
-
-        voltearCartas.addActionListener(e -> {
-            ArrayList<Carta> mano = jugadores.get(jugadorActual).getMano();
-            if (mano.isEmpty()) return;
-
-            boolean actualmenteBocaAbajo = mano.get(0).getCartaBocaAbajo();
-
-            for (Carta carta : mano) {
-                carta.setCartaBocaAbajo(!actualmenteBocaAbajo);
-            }
-
-            mostrarCartasComoBotones(jugadorActual); // actualizar la vista
-        });
-
-
-       /* JButton izquierda = new JButton("<--");
-        izquierda.setFont(new Font("Comic Sans MS", Font.BOLD, 14));
-        izquierda.setBounds(0, 300, 100, 20);
-        add(izquierda);
-        izquierda.addActionListener(e -> {
-            jugadorActual--;
-            if (jugadorActual < 0) {
-                jugadorActual = jugadores.size() - 1;
-            }
-            mostrarTurnoActual();
-            mostrarCartasComoBotones(jugadorActual);
-            repaint();
-        });*/
-
-        JButton derecha = new JButton("Jugar Mano");
-        derecha.setFont(new Font("Comic Sans MS", Font.BOLD, 14));
-        derecha.setBounds(600, 300, 100, 20);
-        add(derecha);
-
-        derecha.addActionListener(e -> {
+        btnPasar.addActionListener(e -> {
+            // Avanza al siguiente jugador
             jugadorActual++;
 
             if (jugadorActual >= jugadores.size()) {
-                // ✅ Todos jugaron su mano
+                remove(btnApostar);
+                remove(btnPasar);
+                ocultarMenuApuestas();
 
-                // 🧹 Ocultar y limpiar botones de cartas
-                for (JButton btn : botonesCartas) {
-                    btn.setVisible(false);
-                    remove(btn);
-                }
-                botonesCartas.clear();
+                JOptionPane.showMessageDialog(this, "Todos pasaron. Fin de la ronda de apuestas.");
+                comenzarDescarte();
 
-                voltearCartas.setVisible(false);
-                remove(voltearCartas);
-                derecha.setVisible(false);
-                remove(derecha);
-
-                // 🕹️ Reiniciar al primer jugador
-                jugadorActual = 0;
-
-                // 💰 Iniciar nueva ronda de apuestas
-                empezarApuestas();
-            } else {
-                // 🔁 Todavía hay jugadores que no han jugado
-
-                mostrarTurnoActual();
-                mostrarCartasComoBotones(jugadorActual);
+                revalidate();
+                repaint();
+            }else {
+                actualizarTurno();
             }
+        });
+    }
 
-            revalidate();
-            repaint();
+    private void insertarApuestaMayor() {
+        removeAll();
+
+        mostrarJugadorActual();
+        actualizarTurno();
+
+        JLabel label = new JLabel("Jugador " + (jugadorActual + 1) + ", ingrese su apuesta mayor:");
+        label.setBounds(10, 50, 400, 25);
+        add(label);
+
+        JTextField campo = new JTextField();
+        campo.setBounds(10, 80, 200, 25);
+        add(campo);
+
+        JButton boton = new JButton("Apostar");
+        boton.setBounds(10, 120, 100, 25);
+        add(boton);
+
+        boton.addActionListener(e -> {
+            try {
+                int cantidad = Integer.parseInt(campo.getText().trim());
+                if (cantidad <= apuestaMayor) {
+                    JOptionPane.showMessageDialog(this, "Debes subir la apuesta.");
+                    return;
+                }
+
+                apuestaMayor = cantidad;
+                apuestaTotal+=cantidad;
+                jugadores.get(jugadorActual).setApuestaHecha(true);
+
+                siguienteJugadorApuesta();
+
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Número inválido.");
+            }
         });
 
+        revalidate();
+        repaint();
+    }
 
+    private void elegirSubirIgualarRetirarse() {
+        removeAll();
+        mostrarJugadorActual();
+        actualizarTurno();
+
+        JLabel texto = new JLabel("Jugador " + (jugadorActual + 1) + ", decide:");
+        texto.setBounds(10, 50, 300, 25);
+        add(texto);
+
+        JButton btnSubir = new JButton("Subir");
+        JButton btnIgualar = new JButton("Igualar");
+        JButton btnRetirarse = new JButton("Retirarse");
+
+        btnSubir.setBounds(10, 100, 100, 25);
+        btnIgualar.setBounds(120, 100, 100, 25);
+        btnRetirarse.setBounds(230, 100, 100, 25);
+
+        add(btnSubir);
+        add(btnIgualar);
+        add(btnRetirarse);
+
+        btnSubir.addActionListener(e -> insertarApuestaMayor());
+
+        btnIgualar.addActionListener(e -> {
+            jugadores.get(jugadorActual).setApuestaHecha(true);
+            apuestaTotal+=apuestaMayor;
+            siguienteJugadorApuesta();
+        });
+
+        btnRetirarse.addActionListener(e -> {
+            jugadores.remove(jugadorActual);
+            if (jugadores.size() <= 1) {
+                JOptionPane.showMessageDialog(this, "Fin de ronda, solo queda un jugador.");
+                comenzarDescarte();
+                return;
+            }
+            if (jugadorActual >= jugadores.size()) jugadorActual = 0;
+            siguienteJugadorApuesta();
+        });
+
+        revalidate();
+        repaint();
+    }
+    private void ocultarMenuApuestas() {
+        removeAll();
+        revalidate();
+        repaint();
+    }
+
+    private void siguienteJugadorApuesta() {
+        int siguiente = obtenerSiguienteJugadorSinApuesta();
+        if (siguiente == -1) {
+            JOptionPane.showMessageDialog(this, "Fin de la ronda de apuestas.");
+            ocultarMenuApuestas();
+            comenzarDescarte();
+
+        } else {
+            jugadorActual = siguiente;
+            elegirSubirIgualarRetirarse();
+        }
+    }
+
+    private int obtenerSiguienteJugadorSinApuesta() {
+        for (int i = 0; i < jugadores.size(); i++) {
+            int index = (jugadorActual + i + 1) % jugadores.size();
+            if (!jugadores.get(index).getApuestaHecha()) {
+                return index;
+            }
+        }
+        return -1;
+    }
+
+    public void comenzarDescarte() {
+        jugadorActual=0;
+        menuMostrarCartasDescarte();
+    }
+    private void descartarYReponerCartas() {
+        JugadorCardDraw jugador = jugadores.get(jugadorActual);
+        ArrayList<Carta> mano = jugador.getMano();
+
+        // Guardamos estado boca abajo (si toda la mano está igual, tomamos la primera como referencia)
+
+        for (int i = 0; i < mano.size(); i++) {
+            Carta carta = mano.get(i);
+
+            if (carta.getCartaSeleccionada()) {
+                // Devolver al mazo la carta descartada
+                mazo.getCartasMazo().add(carta);
+
+                mazo.barajarMazo();
+                // Sacar nueva carta del mazo
+                if (!mazo.getCartasMazo().isEmpty()) {
+                    Carta nuevaCarta = mazo.getCartasMazo().remove(0);
+                    nuevaCarta.setCartaSeleccionada(false); // Por seguridad
+
+                    // Reemplazar en la misma posición
+                    mano.set(i, nuevaCarta);
+                }
+            }
+        }
+    }
+
+    public void menuMostrarCartasDescarte() {
+        removeAll();
+
+        JLabel labelJugador = new JLabel("Jugador " + (jugadorActual + 1) + " - Tus cartas:");
+        labelJugador.setBounds(10, 10, 300, 25);
+        labelJugador.setFont(new Font("Comic Sans MS", Font.BOLD, 14));
+        add(labelJugador);
+
+        ArrayList<Carta> mano = jugadores.get(jugadorActual).getMano();
+
+        ArrayList<JButton> botonesCartas = new ArrayList<>();
+
+        JButton btnDescartarCartas = new JButton("Descartar");
+        btnDescartarCartas.setBounds(500, 100, 100, 25);
+        btnDescartarCartas.setVisible(false);
+        add(btnDescartarCartas);
+
+        JButton btnContinuar = new JButton("Continuar");
+        btnContinuar.setBounds(600, 100, 100, 25);
+        add(btnContinuar);
+
+        btnContinuar.addActionListener(e -> {
+            jugadorActual++;
+            menuMostrarCartasDescarte(); // Mostrar siguiente jugador
+        });
+
+        btnDescartarCartas.addActionListener(e -> {
+            descartarYReponerCartas();
+
+            // Asegurar que las nuevas cartas estén boca abajo
+
+            for (int i = 0; i < mano.size(); i++) {
+                BufferedImage nuevaImg = mano.get(i).getImagen();
+                Image imgEscalada = nuevaImg.getScaledInstance(80, 120, Image.SCALE_SMOOTH);
+                botonesCartas.get(i).setIcon(new ImageIcon(imgEscalada));
+            }
+
+            JOptionPane.showMessageDialog(this, "Cartas descartadas y reemplazadas.");
+            jugadores.get(jugadorActual).setDescarteHecho(true);
+
+            btnDescartarCartas.setVisible(false);
+        });
+
+        int x = 10;
+        int y = 50;
+
+        for (int i = 0; i < mano.size(); i++) {
+            final int index = i;
+            Carta carta = mano.get(i);
+            BufferedImage img = carta.getImagen();
+            Image imgEscalada = img.getScaledInstance(80, 120, Image.SCALE_SMOOTH);
+            ImageIcon icono = new ImageIcon(imgEscalada);
+
+            JButton btnCarta = new JButton(icono);
+            btnCarta.setBounds(x, y, 80, 120);
+            btnCarta.setContentAreaFilled(false);
+            btnCarta.setBorderPainted(false);
+            btnCarta.setFocusPainted(false);
+
+            btnCarta.addActionListener(e -> {
+                Rectangle bounds = btnCarta.getBounds();
+
+                if (!carta.getCartaSeleccionada()) {
+                    btnCarta.setBounds(bounds.x, bounds.y - 10, bounds.width, bounds.height);
+                    carta.setCartaSeleccionada(true);
+                } else {
+                    btnCarta.setBounds(bounds.x, bounds.y + 10, bounds.width, bounds.height);
+                    carta.setCartaSeleccionada(false);
+                }
+
+                if (!jugadores.get(jugadorActual).getDescarteHecho() && jugadores.get(jugadorActual).tieneCartaSeleccionada()) {
+                    btnDescartarCartas.setVisible(true);
+                } else {
+                    btnDescartarCartas.setVisible(false);
+                }
+
+                repaint();
+            });
+
+            add(btnCarta);
+            botonesCartas.add(btnCarta);
+            x += 90;
+        }
+
+        revalidate();
+        repaint();
+    }
+
+
+    @Override
+    public void comenzarEnfrentamiento() {
+
+    }
+
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("Poker - Five Card Draw");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(800, 600);
+        CardDraw panel = new CardDraw();
+        frame.add(panel);
+        frame.setVisible(true);
     }
 }
