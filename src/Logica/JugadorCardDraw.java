@@ -20,6 +20,15 @@ public class JugadorCardDraw extends Jugador {
         this.apuesta = apuesta;
         return apuesta;
     }
+    public boolean tieneCartaSeleccionada() {
+        for (Carta carta : mano) {
+            if (carta.getCartaSeleccionada()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean getApuestaHecha() {
         return apuestaHecha;
     }

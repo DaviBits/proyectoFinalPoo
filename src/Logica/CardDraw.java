@@ -78,8 +78,6 @@ public class CardDraw extends Poker {
             repaint();
         });
     }
-
-    @Override
     public void repartirCartas() {
         JLabel textoRepartir = new JLabel("¿Repartir cartas?");
         textoRepartir.setFont(new Font("Comic Sans MS", Font.BOLD, 14));
@@ -388,8 +386,6 @@ public class CardDraw extends Poker {
         repaint();
     }
 
-
-    @Override
     public void comenzarEnfrentamiento() {
 
     }
