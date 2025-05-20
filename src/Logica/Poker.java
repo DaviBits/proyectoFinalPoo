@@ -1,10 +1,8 @@
 package Logica;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 public abstract class Poker extends JPanel {
     protected Mazo mazo;
@@ -12,6 +10,7 @@ public abstract class Poker extends JPanel {
     protected int numJugadores;
     protected int ronda;
     protected int apuesta;
+    protected Image imagenFondo;
 
     public Poker(){
         setLayout(null);
@@ -33,6 +32,11 @@ public abstract class Poker extends JPanel {
             mazo.eliminarCarta(cartaAgregada);
         }
         return mano;
+    }
+    public void eliminarPrimeraCartaDelMazo(){
+        Carta cartaEliminada=mazo.getCartaEn(mazo.getTamañoDellMazo()-1);
+        System.out.println("La carta eliminada es: "+cartaEliminada);
+        mazo.eliminarCarta(cartaEliminada);
     }
 
     public Carta tomarCarta(){

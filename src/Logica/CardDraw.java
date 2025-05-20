@@ -19,6 +19,10 @@ public class CardDraw extends Poker {
     private boolean segundaRondaDeApuesta = false; // Bandera que marca si ya se hizo la ronda 2 de apuestas.
 
     public CardDraw() {
+        setLayout(null);
+        // Cargar imagen de fondo
+        imagenFondo = new ImageIcon("fondoCardDraw.jpg").getImage();
+
         inicializarJugadores();
         mostrarInfoApuestas();
     }
@@ -102,7 +106,6 @@ public class CardDraw extends Poker {
             repaint();
         });
     }
-    // Método que reparte cartas.
     public void repartirCartas() {
         // Crear y configurar etiqueta que pregunta si se desea repartir cartas
         JLabel textoRepartir = new JLabel("¿Repartir cartas?");
@@ -112,18 +115,28 @@ public class CardDraw extends Poker {
 
         // Crear y configurar botón para confirmar repartir cartas
         JButton btnRepartir = new JButton("Sí, repartir");
-        btnRepartir.setBounds(10, 100, 200, 20);
+        btnRepartir.setBounds(10, 40, 200, 30);
         add(btnRepartir);
 
         // Agregar listener al botón para repartir las cartas cuando se presione
         btnRepartir.addActionListener(e -> {
             int cartasPorJugador = 5;  // Número de cartas a repartir a cada jugador
-            int index = 0;  // Índice para tomar cartas del mazo
+            int totalCartasNecesarias = cartasPorJugador * jugadores.size();
 
-            // Repartir cartas a cada jugador, una por una, en orden
+            // Validar que el mazo tenga suficientes cartas
+            if (mazo.getCartasMazo().size() < totalCartasNecesarias) {
+                JOptionPane.showMessageDialog(this,
+                        "No hay suficientes cartas en el mazo para repartir.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Repartir cartas y removerlas del mazo
             for (int i = 0; i < cartasPorJugador; i++) {
                 for (JugadorCardDraw jugador : jugadores) {
-                    jugador.getMano().add(mazo.getCartasMazo().get(index++));
+                    Carta cartaRepartida = mazo.getCartasMazo().remove(0);
+                    jugador.getMano().add(cartaRepartida);
                 }
             }
 
@@ -139,6 +152,7 @@ public class CardDraw extends Poker {
             repaint();
         });
     }
+
 
     @Override
     public void empezarApuestas() {
@@ -433,6 +447,8 @@ public class CardDraw extends Poker {
             if (carta.getCartaSeleccionada()) {
                 mazo.getCartasMazo().add(carta); // Devuelve la carta al mazo
                 mazo.barajarMazo();              // Baraja el mazo para que sea aleatorio
+                mazo.barajarMazo();
+                mazo.barajarMazo();
 
                 // Si aún hay cartas en el mazo, se toma una nueva
                 if (!mazo.getCartasMazo().isEmpty()) {
@@ -675,6 +691,10 @@ public class CardDraw extends Poker {
 
         revalidate();
         repaint();
+    }
+
+    public void pantallaGanador(){
+        limpiarPanel();
     }
 
     public static void main(String[] args) {
