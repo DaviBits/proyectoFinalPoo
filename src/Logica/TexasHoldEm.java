@@ -28,6 +28,8 @@ public class TexasHoldEm extends Poker {
 
     public TexasHoldEm(){
         super();
+        setLayout(null);
+        imagenFondo = new ImageIcon("fondoCardDraw.jpg").getImage();
         indiceJugadorShowdown=0;
         this.indiceJugadorFlop=0;
         this.huboApuestaEnFlop=false;
@@ -484,17 +486,23 @@ public class TexasHoldEm extends Poker {
         timer.start();
     }
 
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        g.drawImage(imagenFondo, 0, 0, getWidth(), getHeight(), this);
+    }
 
 
 
     // Método para probarlo en una ventana
     public static void main(String[] args) {
-        JFrame frame = new JFrame("Selector de Jugadores");
+        JFrame frame = new JFrame("TEXAS_HOLD_EM");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(1000, 700);
         frame.add(new TexasHoldEm());
         frame.setLocationRelativeTo(null);
         frame.setResizable(false);
         frame.setVisible(true);
+
     }
 }

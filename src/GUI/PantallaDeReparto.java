@@ -54,7 +54,7 @@ public class PantallaDeReparto extends JPanel {
         int y = 100;
 
         for (Carta carta : cartas) {
-            BufferedImage img = carta.getImagen();
+            BufferedImage img = carta.getCartaReverso();
             if (img != null) {
                 g.drawImage(img, x, y, 80, 120, null);  // dibuja carta con tamaño 80x120
             } else {

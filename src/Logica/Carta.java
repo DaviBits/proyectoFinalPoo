@@ -1,9 +1,12 @@
 package Logica;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 public class Carta implements Comparable <Carta>{
-
+    private static final BufferedImage imagenReverso = cargarImagenReverso();
     private BufferedImage imagen;
     private int valor;
     private String palo;
@@ -43,6 +46,18 @@ public class Carta implements Comparable <Carta>{
     public int getValor(){return valor;}
     public void setImagen(BufferedImage imagen) {
         this.imagen = imagen;
+    }
+
+    private static BufferedImage cargarImagenReverso() {
+        try {
+            return ImageIO.read(new File("cartaDeEspalda.png"));
+        } catch (IOException e) {
+            System.err.println("No se pudo cargar la imagen de reverso.");
+            return null;
+        }
+    }
+    public BufferedImage getCartaReverso(){
+        return imagenReverso;
     }
 
     @Override

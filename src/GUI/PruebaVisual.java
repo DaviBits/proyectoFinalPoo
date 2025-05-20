@@ -3,8 +3,11 @@ import javax.swing.*;
 import java.awt.*;
 
 public class PruebaVisual {
+    public PruebaVisual(){
 
-    public static void main(String[] args) {
+    }
+
+    public void mostrar(){
         JFrame ventana= new JFrame("Prueba de pantallas");
         ventana.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         ventana.setResizable(false);
