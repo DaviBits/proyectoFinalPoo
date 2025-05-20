@@ -62,6 +62,12 @@ public abstract class Poker extends JPanel {
         multiplicadoresDeJugadas.put("EscaleraReal", 10);
     }
 
+    public void eliminarPrimeraCartaDelMazo(){
+        Carta cartaEliminada=mazo.getCartaEn(mazo.getTamañoDellMazo()-1);
+        System.out.println("La carta eliminada es: "+cartaEliminada);
+        mazo.eliminarCarta(cartaEliminada);
+    }
+
     public void determinarJugada(ArrayList<Carta> manoDelJugador){
 
     }
