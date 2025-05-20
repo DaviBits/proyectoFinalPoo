@@ -492,17 +492,4 @@ public class TexasHoldEm extends Poker {
         g.drawImage(imagenFondo, 0, 0, getWidth(), getHeight(), this);
     }
 
-
-
-    // Método para probarlo en una ventana
-    public static void main(String[] args) {
-        JFrame frame = new JFrame("TEXAS_HOLD_EM");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(1000, 700);
-        frame.add(new TexasHoldEm());
-        frame.setLocationRelativeTo(null);
-        frame.setResizable(false);
-        frame.setVisible(true);
-
-    }
 }

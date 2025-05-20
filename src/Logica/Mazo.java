@@ -68,12 +68,7 @@ public class Mazo {
     public void barajarMazo() {
         Collections.shuffle(cartasMazo);
     }
-
-    public static void main(String[] args) {
-        Mazo mazo = new Mazo();
-        mazo.barajarMazo();
-        mazo.imprimirMazo();
-    }
+    
     public ArrayList<Carta> getCartasMazo() {
         return cartasMazo;
     }

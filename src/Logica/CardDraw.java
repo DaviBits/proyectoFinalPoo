@@ -848,12 +848,4 @@ public class CardDraw extends Poker {
         revalidate();
         repaint();
     }
-    public static void main(String[] args) {
-        JFrame frame = new JFrame("Poker - Five Card Draw");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(800, 600);
-        CardDraw panel = new CardDraw();
-        frame.add(panel);
-        frame.setVisible(true);
-    }
 }

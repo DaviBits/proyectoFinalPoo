@@ -74,12 +74,5 @@ public class SelectorDeJugadores extends JPanel {
         return numJugadores;
     }
 
-    public static void main(String[] args) {
-        JFrame frame = new JFrame("Selector de Jugadores");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(1000, 700);
-        frame.add(new SelectorDeJugadores());
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
-    }
+
 }
