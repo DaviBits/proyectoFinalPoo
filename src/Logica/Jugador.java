@@ -1,14 +1,36 @@
 package Logica;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
 
 public class Jugador {
-    private  ArrayList<Carta> mano;
-    private String nombre;
+    protected ArrayList<Carta> mano;
+    protected String nombre;
+    protected int puntuacionMano;
     private int fichas;
     private boolean enJuego;
     private int fichasApostadas;
+    private String nombreJugada = "Carta Alta";
+
+    public Jugador(String nombre, ArrayList<Carta> cartas) {
+        this.mano=new ArrayList<>();
+        this.nombre = nombre;
+        this.mano = cartas;
+    }
+
+    public void mostrarCartas(){
+        for(int i=0; i< mano.size(); i++){
+            System.out.println(mano.get(i));
+        }
+    }
+
+    public Jugador() {
+        this.mano = new ArrayList<>();
+    }
+
 
     public Jugador(String nombre, ArrayList<Carta> mano, int fichas){
         this.nombre=nombre;
@@ -17,38 +39,173 @@ public class Jugador {
         this.enJuego=true;
         this.fichasApostadas=0;
     }
-    public Jugador(){
-
-    }
 
     public boolean haAbandonado(){return !enJuego;}
     public int getFichasApostadas(){return fichasApostadas;}
     public void sumarFichasApostadas(int n){this.fichasApostadas+=n;}
     public void abandonarJuego(){this.enJuego=false;}
-    public void setNombre(String nombre){this.nombre=nombre;}
-    public void setMano(ArrayList<Carta> mano){this.mano=mano;}
-    public void setFichas(int fichas){this.fichas=fichas;}
-    public String getNombre(){return nombre;}
-
     public int getFichas(){return fichas;}
     public void restarFichas(int fichasARestar){this.fichas-=fichasARestar;}
-    public void eliminarCarta(Carta cartaEliminada){mano.remove(cartaEliminada);}
+
+
+    public String getNombreJugada() {
+        return nombreJugada;
+    }
+
+    public void setNombreJugada(String nombreJugada) {
+        this.nombreJugada = nombreJugada;
+    }
+
     public ArrayList<Carta> getMano() {
         return mano;
     }
-    //ordena la mano del jugador de la menor a la mayor (mayor -> menor)
-    public void ordenarCartaPorValor(){
-      mano.sort(Comparator.comparingInt(Carta::getValor));
-    }
-    //ordena la mano por palos según el orden alfabetico, no por el valor jerárquico de los palos
-    public void ordenarCartaPorPalo(){
-        mano.sort(Comparator.comparing(Carta::getPalo));
+
+    public void setMano(ArrayList<Carta> mano) {
+        this.mano = mano;
     }
 
-    public void mostrarCartas(){
-        for(int i=0; i< mano.size(); i++){
-            System.out.println(mano.get(i));
-        }
+    public String getNombre() {
+        return nombre;
     }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public int getPuntuacionMano() {
+        return puntuacionMano;
+    }
+
+    public void setPuntuacionMano(int puntuacionMano) {
+        this.puntuacionMano = puntuacionMano;
+    }
+
+    public void evaluarMano() {
+        if (mano.size() != 5) {
+            nombreJugada = "Mano inválida";
+            puntuacionMano = 0;
+            return;
+        }
+
+        // Ordenar copia de la mano por valor
+        ArrayList<Carta> manoOrdenada = new ArrayList<>(mano);
+        manoOrdenada.sort(Comparator.comparingInt(Carta::getValor));
+
+        boolean esColor = esColor(manoOrdenada);
+        boolean esEscalera = esEscalera(manoOrdenada);
+        HashMap<Integer, Integer> frecuencias = contarFrecuencias(manoOrdenada);
+
+        String mejorNombre = "Carta Alta";
+        int mejorPuntuacion = 1;
+
+        if (esColor && esEscalera && contieneValores(manoOrdenada, 10, 11, 12, 13, 14)) {
+            mejorNombre = "Escalera Real";
+            mejorPuntuacion = 10;
+        } else if (esColor && esEscalera) {
+            mejorNombre = "Escalera de Color";
+            mejorPuntuacion = 9;
+        } else if (tieneNDeUnTipo(frecuencias, 4)) {
+            mejorNombre = "Póquer";
+            mejorPuntuacion = 8;
+        } else if (tieneFull(frecuencias)) {
+            mejorNombre = "Full";
+            mejorPuntuacion = 7;
+        } else if (esColor) {
+            mejorNombre = "Color";
+            mejorPuntuacion = 6;
+        } else if (esEscalera) {
+            mejorNombre = "Escalera";
+            mejorPuntuacion = 5;
+        } else if (tieneNDeUnTipo(frecuencias, 3)) {
+            mejorNombre = "Trío";
+            mejorPuntuacion = 4;
+        } else if (tieneDoblePar(frecuencias)) {
+            mejorNombre = "Doble Par";
+            mejorPuntuacion = 3;
+        } else if (tieneNDeUnTipo(frecuencias, 2)) {
+            mejorNombre = "Par";
+            mejorPuntuacion = 2;
+        }
+
+        nombreJugada = mejorNombre;
+        puntuacionMano = mejorPuntuacion;
+    }
+
+    private boolean esColor(ArrayList<Carta> mano) {
+        String palo = mano.get(0).getPalo().toLowerCase().trim();
+        for (Carta c : mano) {
+            if (!c.getPalo().toLowerCase().trim().equals(palo)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean esEscalera(ArrayList<Carta> mano) {
+        ArrayList<Integer> valores = new ArrayList<>();
+        for (Carta c : mano) {
+            valores.add(c.getValor());
+        }
+        Collections.sort(valores);
+
+        // Comprobar escalera normal
+        boolean escaleraNormal = true;
+        for (int i = 0; i < valores.size() - 1; i++) {
+            if (valores.get(i + 1) != valores.get(i) + 1) {
+                escaleraNormal = false;
+                break;
+            }
+        }
+
+        // Comprobar escalera baja (A = 14, pero actuando como 1)
+        boolean escaleraBaja = valores.equals(List.of(2, 3, 4, 5, 14));
+
+        return escaleraNormal || escaleraBaja;
+    }
+
+    private boolean contieneValores(ArrayList<Carta> mano, int... valores) {
+        ArrayList<Integer> valoresMano = new ArrayList<>();
+        for (Carta c : mano) {
+            valoresMano.add(c.getValor());
+        }
+        for (int val : valores) {
+            if (!valoresMano.contains(val)) return false;
+        }
+        return true;
+    }
+
+    private HashMap<Integer, Integer> contarFrecuencias(ArrayList<Carta> mano) {
+        HashMap<Integer, Integer> freq = new HashMap<>();
+        for (Carta c : mano) {
+            freq.put(c.getValor(), freq.getOrDefault(c.getValor(), 0) + 1);
+        }
+        return freq;
+    }
+
+    private boolean tieneNDeUnTipo(HashMap<Integer, Integer> freq, int n) {
+        for (int count : freq.values()) {
+            if (count == n) return true;
+        }
+        return false;
+    }
+
+    private boolean tieneFull(HashMap<Integer, Integer> freq) {
+        boolean tiene3 = false;
+        boolean tiene2 = false;
+        for (int count : freq.values()) {
+            if (count == 3) tiene3 = true;
+            else if (count == 2) tiene2 = true;
+        }
+        return tiene3 && tiene2;
+    }
+
+    private boolean tieneDoblePar(HashMap<Integer, Integer> freq) {
+        int pares = 0;
+        for (int count : freq.values()) {
+            if (count == 2) pares++;
+        }
+        return pares == 2;
+    }
+
 
 }
