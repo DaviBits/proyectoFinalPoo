@@ -17,6 +17,7 @@ public class CardDraw extends Poker {
     private JLabel labelApuestaMayor = new JLabel();
     private JLabel labelApuestaTotal = new JLabel();
     private boolean segundaRondaDeApuesta = false; // Bandera que marca si ya se hizo la ronda 2 de apuestas.
+    private Image imagenFondo;
 
     public CardDraw() {
         setLayout(null);
@@ -26,6 +27,17 @@ public class CardDraw extends Poker {
         inicializarJugadores();
         mostrarInfoApuestas();
     }
+
+    //Utiliza paint para cargar el fondo y que nunca se borre.
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        if (imagenFondo != null) {
+            g.drawImage(imagenFondo, 0, 0, getWidth(), getHeight(), this);
+        }
+    }
+
+
 
     // Da las propiedades al label jugadorEnPantalla.
     private void mostrarJugadorActual() {
@@ -63,6 +75,7 @@ public class CardDraw extends Poker {
     public void inicializarJugadores() {
         // Label que muestra una frase.
         setLayout(null);
+        limpiarPanel();
         JLabel labelJugadores = new JLabel("¿Cuántos jugadores desea?");
         labelJugadores.setBounds(10, 10, 300, 20);
         labelJugadores.setFont(new Font("Comic Sans MS", Font.BOLD, 14));
@@ -340,7 +353,7 @@ public class CardDraw extends Poker {
         // Acción al presionar "Subir": se dirige a ingresar una nueva apuesta mayor
         btnSubir.addActionListener(e -> insertarApuestaMayor());
 
-        // Acción al presionar "Igualar"
+
         btnIgualar.addActionListener(e -> {
             JugadorCardDraw jugador = jugadores.get(jugadorActual);
             int diferencia = apuestaMayor - jugador.getCantidadApostada();
@@ -369,6 +382,7 @@ public class CardDraw extends Poker {
             // Si solo queda un jugador, termina el juego
             if (jugadores.size() <= 1) {
                 JOptionPane.showMessageDialog(this, "Solo queda un jugador, se acaba el juego.");
+                pantallaGanador();
                 return; // Se detiene aquí si el juego termina
             }
 
@@ -447,8 +461,6 @@ public class CardDraw extends Poker {
             if (carta.getCartaSeleccionada()) {
                 mazo.getCartasMazo().add(carta); // Devuelve la carta al mazo
                 mazo.barajarMazo();              // Baraja el mazo para que sea aleatorio
-                mazo.barajarMazo();
-                mazo.barajarMazo();
 
                 // Si aún hay cartas en el mazo, se toma una nueva
                 if (!mazo.getCartasMazo().isEmpty()) {
@@ -562,7 +574,7 @@ public class CardDraw extends Poker {
             btnCarta.setBorderPainted(false);
             btnCarta.setFocusPainted(false);
 
-            // Acción al hacer clic en una carta (seleccionarla para descarte)
+            // Acción al hacer clic en una carta
             btnCarta.addActionListener(e -> {
                 Rectangle bounds = btnCarta.getBounds();
 
@@ -634,10 +646,26 @@ public class CardDraw extends Poker {
         btnSiguiente.setVisible(true);
         add(btnSiguiente);
 
+        // Botón para pasar a la pantalla final de ganador
+        JButton btnVerGanador = new JButton("Ver Ganador");
+        btnVerGanador.setBounds(600, 100, 100, 25);
+        btnVerGanador.setVisible(true);
+        add(btnVerGanador);
+
+
         // Acción al presionar "Siguiente"
         btnSiguiente.addActionListener(e -> {
             jugadorActual = (jugadorActual + 1) % numJugadores; // Avanza circularmente
             verCartasEnfrentamiento(); // Muestra la siguiente mano
+        });
+
+        btnVerGanador.addActionListener(e -> {
+            if(hayEmpate()){
+                pantallaEmpate();
+            }
+            else {
+                pantallaGanador();
+            }
         });
 
         // Coordenadas para colocar las cartas visualmente
@@ -658,7 +686,7 @@ public class CardDraw extends Poker {
             btnCarta.setBorderPainted(false);
             btnCarta.setFocusPainted(false);
 
-            // Acción visual opcional al seleccionar una carta (no afecta lógica)
+            // Acción visual opcional al seleccionar una carta
             btnCarta.addActionListener(e -> {
                 Rectangle bounds = btnCarta.getBounds();
 
@@ -677,14 +705,13 @@ public class CardDraw extends Poker {
             botonesCartas.add(btnCarta);
             x += 90; // Mueve el siguiente botón más a la derecha
         }
-        // ... dentro de verCartasEnfrentamiento() justo después del for de cartas:
 
         Jugador jugador = jugadores.get(jugadorActual);
-        jugador.evaluarMano(); // ← Asegura que se analice la mano actual
+        jugador.evaluarMano(); // Analiza la mano para saber su jugada
 
         JLabel labelJugada = new JLabel("Jugada: " + jugador.getNombreJugada() + " | Puntuación: " + jugador.getPuntuacionMano());
         labelJugada.setFont(new Font("Comic Sans MS", Font.BOLD, 16));
-        labelJugada.setBounds(10, y + 130, 400, 25);  // Ajusta la posición
+        labelJugada.setBounds(10, y + 130, 400, 25);
         add(labelJugada);
 
 
@@ -693,10 +720,134 @@ public class CardDraw extends Poker {
         repaint();
     }
 
-    public void pantallaGanador(){
-        limpiarPanel();
+
+    public boolean hayEmpate() {
+
+        int mayorPuntuacion = -1; // Guarda la puntuación más alta encontrada
+        int cantidadConMayorPuntuacion = 0; // Cuenta cuántos jugadores tienen esa puntuación
+
+        // Recorre todos los jugadores para determinar el número de empates
+        for (JugadorCardDraw jugador : jugadores) {
+            int puntuacion = jugador.getPuntuacion();
+
+            if (puntuacion > mayorPuntuacion) {
+                // Se ha encontrado una nueva puntuación alta
+                mayorPuntuacion = puntuacion;
+                cantidadConMayorPuntuacion = 1; // Reinicia el contador
+            } else if (puntuacion == mayorPuntuacion) {
+                // Otro jugador tiene la misma puntuación alta
+                cantidadConMayorPuntuacion++;
+            }
+        }
+        return cantidadConMayorPuntuacion > 1;
     }
 
+    // Muestra el ganador o si hay empate
+    public JugadorCardDraw getJugadorConMasPuntuacion() {
+        if (jugadores == null || jugadores.isEmpty()) {
+            return null; //Si no hay jugadores
+        }
+
+        JugadorCardDraw mejorJugador = jugadores.get(0);
+
+        for (JugadorCardDraw jugador : jugadores) {//Ciclo para verificar el mejor jugador
+            if (jugador.getPuntuacion() > mejorJugador.getPuntuacion()) {
+                mejorJugador = jugador;
+            }
+        }
+
+        return mejorJugador;
+    }
+    public void pantallaEmpate() {
+        limpiarPanel();
+
+        // Obtener la mayor puntuación
+        int mayorPuntuacion = -1;
+        for (JugadorCardDraw jugador : jugadores) {
+            if (jugador.getPuntuacion() > mayorPuntuacion) {
+                mayorPuntuacion = jugador.getPuntuacion();
+            }
+        }
+        // Obtener los jugadores empatados
+        ArrayList<Integer> indicesEmpatados = new ArrayList<>();
+        for (int i = 0; i < jugadores.size(); i++) {
+            if (jugadores.get(i).getPuntuacion() == mayorPuntuacion) {
+                indicesEmpatados.add(i);
+            }
+        }
+
+        // Calcular apuesta dividida
+        int apuestaPorJugador = apuestaTotal / indicesEmpatados.size();
+
+        // Título
+        JLabel titulo = new JLabel("¡Hay un empate!");
+        titulo.setFont(new Font("Comic Sans MS", Font.BOLD, 24));
+        titulo.setBounds(10, 20, 400, 30);
+        add(titulo);
+
+        // Mostrar info de cada jugador empatado
+        int y = 70; // posición vertical inicial
+        for (int i = 0; i < indicesEmpatados.size(); i++) {
+            int indice = indicesEmpatados.get(i);
+            JugadorCardDraw jugador = jugadores.get(indice);
+
+            JLabel info = new JLabel("Jugador #" + (indice + 1) + " - Jugada: "
+                    + jugador.getNombreJugada() + " Recibe " + apuestaPorJugador + " unidades.");
+            info.setFont(new Font("Comic Sans MS", Font.PLAIN, 16));
+            info.setBounds(10, y, 700, 25);
+            add(info);
+            y += 30; // espacio entre líneas
+        }
+
+        // Botón para salir
+        JButton btnSalir = new JButton("Salir");
+        btnSalir.setBounds(220, y + 20, 100, 30);
+        add(btnSalir);
+        btnSalir.addActionListener(e -> System.exit(0));
+
+        revalidate();
+        repaint();
+    }
+
+    public void pantallaGanador() {
+        // Limpiar la pantalla
+        limpiarPanel();
+        // Obtener al jugador con mayor puntuación
+        JugadorCardDraw ganador = getJugadorConMasPuntuacion();
+
+        // Obtener número del jugador
+        int numeroJugador = jugadores.indexOf(ganador) + 1;
+
+        // Crear etiqueta de título
+        JLabel titulo = new JLabel("¡Tenemos un ganador!");
+        titulo.setFont(new Font("Comic Sans MS", Font.BOLD, 24));
+        titulo.setBounds(10, 20, 400, 30);
+        add(titulo);
+
+        // Mostrar número, nombre de la jugada y apuesta total
+        // Uso de este formato para no hacer tan larga la línea
+        String textoInfo = String.format(
+                "Jugador #%d ganó con la jugada \"%s\" y se llevó %d unidades.",
+                numeroJugador,
+                ganador.getNombreJugada(),
+                apuestaTotal
+        );
+        // Aqui info ganador toma el texto de textoInfo
+        JLabel infoGanador = new JLabel(textoInfo);
+        infoGanador.setFont(new Font("Comic Sans MS", Font.PLAIN, 18));
+        infoGanador.setBounds(10, 70, 600, 25);
+        add(infoGanador);
+
+        // Botón para salir del juego
+        JButton btnSalir = new JButton("Salir");
+        btnSalir.setBounds(220, 120, 100, 30);
+        add(btnSalir);
+
+        btnSalir.addActionListener(e -> System.exit(0));
+
+        revalidate();
+        repaint();
+    }
     public static void main(String[] args) {
         JFrame frame = new JFrame("Poker - Five Card Draw");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
