@@ -112,12 +112,12 @@ public class ControladorDeApuestas extends JPanel {
 
         botonRetirarse.addActionListener(e->{
             this.abandona=true;
-                jugador.abandonarJuego();
-                botonIgualar.setVisible(false);
-                botonSubir.setVisible(false);
-                botonRetirarse.setVisible(false);
-                botonSiguienteJugador.setVisible(true);
-                botonSiguienteJugador.setEnabled(true);
+            jugador.abandonarJuego();
+            botonIgualar.setVisible(false);
+            botonSubir.setVisible(false);
+            botonRetirarse.setVisible(false);
+            botonSiguienteJugador.setVisible(true);
+            botonSiguienteJugador.setEnabled(true);
             if (callbackFinDeTurno != null) callbackFinDeTurno.run();
         });
 

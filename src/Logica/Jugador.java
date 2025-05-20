@@ -10,27 +10,21 @@ public class Jugador {
     protected ArrayList<Carta> mano;
     protected String nombre;
     protected int puntuacionMano;
+    private String nombreJugada = "Carta Alta"; // Valor por defecto
     private int fichas;
     private boolean enJuego;
     private int fichasApostadas;
-    private String nombreJugada = "Carta Alta";
 
-    public Jugador(String nombre, ArrayList<Carta> cartas) {
-        this.mano=new ArrayList<>();
-        this.nombre = nombre;
-        this.mano = cartas;
+
+
+    public Jugador() {
+        this.mano = new ArrayList<>();
     }
-
     public void mostrarCartas(){
         for(int i=0; i< mano.size(); i++){
             System.out.println(mano.get(i));
         }
     }
-
-    public Jugador() {
-        this.mano = new ArrayList<>();
-    }
-
 
     public Jugador(String nombre, ArrayList<Carta> mano, int fichas){
         this.nombre=nombre;
@@ -39,6 +33,7 @@ public class Jugador {
         this.enJuego=true;
         this.fichasApostadas=0;
     }
+
 
     public boolean haAbandonado(){return !enJuego;}
     public int getFichasApostadas(){return fichasApostadas;}

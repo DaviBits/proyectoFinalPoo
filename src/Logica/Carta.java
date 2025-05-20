@@ -9,7 +9,6 @@ public class Carta {
     private String palo;
     private boolean cartaSeleccionada = false;
     private String color;
-    private boolean cartaBocaAbajo = true;
 
     public Carta(int valor, String palo, String color, BufferedImage imagen) {
         this.valor = valor;
@@ -24,9 +23,6 @@ public class Carta {
 
     public void setCartaSeleccionada(boolean cartaSeleccionada) {
         this.cartaSeleccionada = cartaSeleccionada;
-    }
-    public void setCartaBocaAbajo(boolean cartaBocaAbajo) {
-        this.cartaBocaAbajo = cartaBocaAbajo;
     }
 
     public int getValorCarta() {
@@ -47,9 +43,5 @@ public class Carta {
     public int getValor(){return valor;}
     public void setImagen(BufferedImage imagen) {
         this.imagen = imagen;
-    }
-
-    public boolean getCartaBocaAbajo() {
-        return cartaBocaAbajo;
     }
 }

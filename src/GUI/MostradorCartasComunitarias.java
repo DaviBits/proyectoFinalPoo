@@ -23,7 +23,7 @@ public class MostradorCartasComunitarias extends JPanel{
     protected void paintComponent(Graphics g) {
         System.out.println("se esta intentando dibujar algo");
         super.paintComponent(g);
-       // ArrayList<Carta> cartas ;
+        // ArrayList<Carta> cartas ;
         if (cartas == null || cartas.isEmpty()) {
             return;
         }

@@ -33,31 +33,31 @@ public class ControladorDelFlop extends ControladorDeApuestas{
             botonApostar.addActionListener(e-> {
                 jugadorAposto=true;
                 String apuestaTexto=JOptionPane.showInputDialog("¿Cuánto quieres subir?");
-                 try{
-                     int apuesta= Integer.parseInt(apuestaTexto);
-                     if(apuesta<= jugador.getFichas()){
-                         int diferenciaDeFichas=fichasEnApuesta-jugador.getFichasApostadas();
-                         jugadorAposto=true;
-                         this.nadieHaApostado=false;
-                         System.out.println("el jugador aposto: "+ apuesta);
-                         subida=apuesta;
-                         huboSubida=true;
-                         fichasAgregadas = apuesta+diferenciaDeFichas;
-                         jugador.restarFichas(fichasAgregadas);
-                         jugador.sumarFichasApostadas(fichasAgregadas);
+                try{
+                    int apuesta= Integer.parseInt(apuestaTexto);
+                    if(apuesta<= jugador.getFichas()){
+                        int diferenciaDeFichas=fichasEnApuesta-jugador.getFichasApostadas();
+                        jugadorAposto=true;
+                        this.nadieHaApostado=false;
+                        System.out.println("el jugador aposto: "+ apuesta);
+                        subida=apuesta;
+                        huboSubida=true;
+                        fichasAgregadas = apuesta+diferenciaDeFichas;
+                        jugador.restarFichas(fichasAgregadas);
+                        jugador.sumarFichasApostadas(fichasAgregadas);
 
-                         botonIgualar.setEnabled(false);
-                         botonSubir.setEnabled(false);
-                         botonApostar.setEnabled(false);
-                         botonPasar.setEnabled(false);
-                         botonRetirarse.setEnabled(false);
-                         botonApostar.setEnabled(false);
-                         botonSiguienteJugador.setEnabled(true);
-                         actualizarLabelsDeFichas();
-                     }
-                 }catch (NumberFormatException ex) {
-                     JOptionPane.showMessageDialog(null, "Por favor ingresa un número válido.");
-                 }
+                        botonIgualar.setEnabled(false);
+                        botonSubir.setEnabled(false);
+                        botonApostar.setEnabled(false);
+                        botonPasar.setEnabled(false);
+                        botonRetirarse.setEnabled(false);
+                        botonApostar.setEnabled(false);
+                        botonSiguienteJugador.setEnabled(true);
+                        actualizarLabelsDeFichas();
+                    }
+                }catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(null, "Por favor ingresa un número válido.");
+                }
             });
             actualizarBotonApostar();
 
