@@ -6,7 +6,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-
+//esta clase sirve para mostrar a los jugadores de forma visual que se les
+//están entregando cartas de forma individual, se manda una foto
+//de la carta volteada porque asi lo dice el flujo del juego
 public class PantallaDeReparto extends JPanel {
     private Jugador jugador;
     private JLabel labelJugadores;

@@ -7,7 +7,8 @@ import java.util.Collections;
 import javax.imageio.ImageIO;
 
 public class Mazo {
-
+//esta clase contiene un arreglo de cartas, simulando una baraja o mazo.
+    
     private String[] palos = { "Corazones", "Treboles", "Diamantes", "Picas" }; // Orden del sprite
     private ArrayList<Carta> cartasMazo;
     private BufferedImage imagenCartas;
@@ -68,7 +69,7 @@ public class Mazo {
     public void barajarMazo() {
         Collections.shuffle(cartasMazo);
     }
-    
+
     public ArrayList<Carta> getCartasMazo() {
         return cartasMazo;
     }

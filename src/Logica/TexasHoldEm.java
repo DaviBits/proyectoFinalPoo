@@ -29,7 +29,6 @@ public class TexasHoldEm extends Poker {
     public TexasHoldEm(){
         super();
         setLayout(null);
-        imagenFondo = new ImageIcon("fondoCardDraw.jpg").getImage();
         indiceJugadorShowdown=0;
         this.indiceJugadorFlop=0;
         this.huboApuestaEnFlop=false;
@@ -38,7 +37,8 @@ public class TexasHoldEm extends Poker {
         this.indiceJugadorEnPreFlop=0;
         inicializarJugadores();
     }
-
+    //sirve para leer la cantidad de jugadores (2-10) a traves de la GUI
+    //tambien crea las instancias de los jugadores y los mete a un ArrayList
     @Override
     public void inicializarJugadores() {
         SelectorDeJugadores selectorDeJugadores=new SelectorDeJugadores();
@@ -61,7 +61,10 @@ public class TexasHoldEm extends Poker {
         revalidate();
         repaint();
     }
-    //metodo equivalente a la etapa de "las ciegas"
+
+    //método equivalente a la etapa de "las ciegas",
+    //el jugador 1, el que se registra primero será la ciega chica
+    //el jugador que le sigue en el arrayList sera  la ciega grande
     @Override
     public void empezarApuestas() {
         int minimoCiegaChica=1, maximoCiegChica=150;
@@ -156,7 +159,8 @@ public class TexasHoldEm extends Poker {
         revalidate();
         repaint();
     }
-
+    //como su nombre lo dice, solo le reparte sus cartas volteadas a los jugadores
+    //además maneja el flujo en que se muestren
     public void reparto() {
         apuesta = apuestaTotal.get();
         System.out.println("apuesta final: " + apuesta);
@@ -173,7 +177,6 @@ public class TexasHoldEm extends Poker {
         pantallaDeReparto.setBounds(0, 0, 1000, 550);
         add(pantallaDeReparto);
 
-        // Botón para avanzar al siguiente jugador
         JButton siguiente = new JButton("Siguiente");
         siguiente.setBounds(400, 600, 150, 30);
         siguiente.setVisible(true);
@@ -197,19 +200,22 @@ public class TexasHoldEm extends Poker {
         repaint();
     }
 
+    //este método modela al preflop, usa un índice para manejar que
+    //la ciega chica y grande no comiencen aquí
     public void preFlop(){
         apuestaAIgualarIndividual=ciegaGrande;
         System.out.println("pre flop");
         this.indiceJugadorEnPreFlop=2;
         mostrarTurnoPreFlop();
     }
-
+    //este método es la parte grafica del preflop, muestra las
+    //acciones que puede realizar por medio de la GUI
+    //por asi decirlo, el método"pre flop" son los preparativos de este
     private void mostrarTurnoPreFlop() {
         if (panelPreFlop != null) {
             remove(panelPreFlop);
         }
 
-        // Buscar el siguiente jugador que no haya abandonado
         while (indiceJugadorEnPreFlop < jugadores.size() && jugadores.get(indiceJugadorEnPreFlop).haAbandonado()) {
             indiceJugadorEnPreFlop++;
         }
@@ -225,7 +231,6 @@ public class TexasHoldEm extends Poker {
             botonSiguiente.setFont(new Font("Comic Sans MS", Font.BOLD, 18));
             botonSiguiente.setEnabled(false); // Deshabilitado al inicio
 
-            // Este callback se invoca cuando el jugador realiza su acción
             panelPreFlop.setCallbackFinDeTurno(() -> {
                 botonSiguiente.setEnabled(true);
                 if (panelPreFlop.huboSubida()) {
@@ -239,7 +244,7 @@ public class TexasHoldEm extends Poker {
                 if(!panelPreFlop.huboSubida()){
                     indiceJugadorEnPreFlop++;
                 }
-                remove(panelPreFlop);  // IMPORTANTE: limpiar antes de mostrar el siguiente
+                remove(panelPreFlop);
                 mostrarTurnoPreFlop();
             });
 
@@ -248,12 +253,14 @@ public class TexasHoldEm extends Poker {
             revalidate();
             repaint();
         } else {
-            // Fin del pre-flop
             System.out.println("Fin de las apuestas del pre-flop. Total acumulado: " + apuestaTotal.get());
             flop();
         }
     }
 
+    //método que modela la etapa del flop, este método es de suma
+    //importancia, ya que maneja la lógica de apuestas que se usa casi
+    //todas las rondas y se reusa varias veces
     public void flop(){
         System.out.println("EL REPARTIDOR ELIMINA LA PRIMERA CARTA EN LA PARTE DE ARRIBA: ");
         eliminarPrimeraCartaDelMazo();
@@ -264,10 +271,10 @@ public class TexasHoldEm extends Poker {
         }
         mostrarCartasComunitariasConDelay(() -> flopVisual("flop"));
     }
-
+    // este métodoes el complemento visual del método del flop
+    //este método es el que si se recicla varias veces puesto que en las rondas
+    //de apuestas se manejan las mismas opciones
     public void flopVisual(String fase){
-
-
         while (indiceJugadorFlop < jugadores.size() && jugadores.get(indiceJugadorFlop).haAbandonado()) {
             indiceJugadorFlop++;
         }
@@ -281,11 +288,9 @@ public class TexasHoldEm extends Poker {
             JButton botonSiguiente = new JButton("Siguiente jugador");
             botonSiguiente.setBounds(720, 500, 200, 50);
             botonSiguiente.setFont(new Font("Comic Sans MS", Font.BOLD, 18));
-            botonSiguiente.setEnabled(false); // Deshabilitado al inicio
+            botonSiguiente.setEnabled(false);
             panelFlop.setBotonSiguienteJugador(botonSiguiente);
 
-
-            // Este callback se invoca cuando el jugador realiza su acción
             panelFlop.setCallbackFinDeTurno(() -> {
                 botonSiguiente.setEnabled(true);
                 if (panelFlop.elJugadorAposto()) {
@@ -339,7 +344,7 @@ public class TexasHoldEm extends Poker {
         }
 
     }
-
+    //preparativos lógicos para poder reutilizar el flop para la fase del turn
     public void turn(){
         System.out.println("EL REPARTIDOR ELIMINA LA PRIMERA CARTA EN LA PARTE DE ARRIBA: ");
         eliminarPrimeraCartaDelMazo();
@@ -352,12 +357,16 @@ public class TexasHoldEm extends Poker {
         this.indiceJugadorFlop = 0;
         this.huboApuestaEnFlop = false;
         this.yaSeMostroBotonApostarFlop = false;
-
+        //llamada a un método que va mostrando las cartas comunitarias
+        //y posteriormente llama al turn para volver a apostar
         mostrarCartasComunitariasConDelay(() -> flopVisual("turn"));
 
 
     }
 
+    //de nuevo, este método hace como preparativo para la siguiente ronda de apuestas
+    //llama a mostrar las cartas comunitarias y ahora sí, muestra la última fase
+    //de apuestas
     public void river(){
         System.out.println("EL REPARTIDOR ELIMINA LA PRIMERA CARTA EN LA PARTE DE ARRIBA: ");
         eliminarPrimeraCartaDelMazo();
@@ -372,6 +381,10 @@ public class TexasHoldEm extends Poker {
         this.yaSeMostroBotonApostarFlop = false;
         mostrarCartasComunitariasConDelay(() -> flopVisual("river"));
     }
+
+    //en esta fase por cada jugador que siga en juego, se les permite
+    //armar su mano con sus cartas y las cartas comunitarias
+    //posteriormente se procesan y comparan resultados de cada quien
 
     public void enfrentamiento() {
         System.out.println("BATALLA FINAL");
@@ -445,7 +458,8 @@ public class TexasHoldEm extends Poker {
         AnunciarGanador();
 
     }
-
+    //esta ya no modela como tal ninguna clase del juego, pero es importante
+    //para dar fin, solo busca el mayor puntaje y muestra a quien pertenece
     public void AnunciarGanador(){
         removeAll();
         int puntuacionMasAlta=0;

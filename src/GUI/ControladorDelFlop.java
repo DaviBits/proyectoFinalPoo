@@ -6,7 +6,9 @@ import javax.swing.*;
 import java.awt.*;
 
 public class ControladorDelFlop extends ControladorDeApuestas{
-
+//esta clase maneja toda la GUI y la lógica de los botones de las etapas de apuesta,
+    //extiende de ControladorDeApuesta, ya que esa clase modela al flop y ya tiene casi
+    //todas las acciones implementadas
     private JButton botonApostar;
     private boolean nadieHaApostado;
     private boolean jugadorAposto;

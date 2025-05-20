@@ -4,7 +4,8 @@ import javax.swing.*;
 import java.awt.*;
 
 public class SelectorDeJugadores extends JPanel {
-
+    //esta clase tiene los botones y lectores que me permiten saber cuantos jugadores habrá
+    //y como se llama cada uno
     private int numJugadores = 2;
     private final int MIN_JUGADORES = 2;
     private final int MAX_JUGADORES = 10;

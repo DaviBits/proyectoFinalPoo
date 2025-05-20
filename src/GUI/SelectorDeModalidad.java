@@ -10,6 +10,10 @@ import java.awt.event.ActionListener;
 
 public class SelectorDeModalidad extends JPanel {
     private Image imagenFondo;
+    /*
+    esta clase principalmente maneja los frames que guardan a los paneles de cada juego
+    y que se activen con un botón respectivamente
+     */
     public SelectorDeModalidad(JPanel contenedor, CardLayout layout){
         imagenFondo = new ImageIcon(getClass().getResource("/Imagenes/MenuDeInicio.png")).getImage();
         setLayout(null);

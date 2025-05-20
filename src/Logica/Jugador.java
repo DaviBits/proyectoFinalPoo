@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-
+//clase que modela a un jugador de la vida real
 public class Jugador {
     protected ArrayList<Carta> mano;
     protected String nombre;

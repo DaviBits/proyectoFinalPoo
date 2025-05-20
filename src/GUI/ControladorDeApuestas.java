@@ -5,6 +5,13 @@ import Logica.Jugador;
 import javax.swing.*;
 import java.awt.*;
 
+
+/*
+esta clase es la primera version de las etapas de apuestas,
+el pre flop, esta clase se usa como clase padre de ControladorDeApuestas,
+ya que ya tiene implementados botones para igualar, subir, retirarse, solo
+le faltaba el de apostar pero ese no se usa en esta parte del juego
+ */
 public class ControladorDeApuestas extends JPanel {
     private Jugador jugador;
     protected int fichasEnApuesta;
@@ -123,6 +130,14 @@ public class ControladorDeApuestas extends JPanel {
 
         botonIgualar.addActionListener(e -> {
             int diferenciaDeFichas = fichasEnApuesta - jugador.getFichasApostadas();
+            if(jugador.getFichasApostadas()==0){
+                System.out.println("el jugador esta all-in");
+                botonIgualar.setEnabled(false);
+                botonSubir.setEnabled(false);
+                botonRetirarse.setEnabled(false);
+                botonSiguienteJugador.setEnabled(true);
+                actualizarLabelsDeFichas();
+            }
             if (diferenciaDeFichas <= jugador.getFichas()) {
                 this.iguala=true;
                 fichasAgregadas = diferenciaDeFichas;
@@ -147,7 +162,7 @@ public class ControladorDeApuestas extends JPanel {
             String input = JOptionPane.showInputDialog("¿Cuánto quieres subir?");
             try {
                 int apuestaNum = Integer.parseInt(input);
-                if (apuestaNum > jugador.getFichas() || apuestaNum <= 0) {
+                if (apuestaNum > jugador.getFichas() || apuestaNum <=0) {
                     JOptionPane.showMessageDialog(null, "Apuesta inválida.");
                 } else {
                     this.sube=true;

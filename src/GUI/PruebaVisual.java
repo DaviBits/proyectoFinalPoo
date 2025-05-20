@@ -3,6 +3,9 @@ import javax.swing.*;
 import java.awt.*;
 
 public class PruebaVisual {
+
+    //esta clase cambia entre los paneles de un logo que
+    //agregamos y el del selector de juego
     public PruebaVisual(){
 
     }

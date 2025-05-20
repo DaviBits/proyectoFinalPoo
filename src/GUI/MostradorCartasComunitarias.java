@@ -6,6 +6,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+/*
+esta clase sirve para mostrar en pantalla las clases de uso compartido, no use una sola
+para las individuales y estas porque en la clase que muestra las cartas del jugador
+uso al jugador como parámetro, puesto que necesito más datos de él, aquí no
+ */
 
 public class MostradorCartasComunitarias extends JPanel{
     private ArrayList<Carta> cartas;

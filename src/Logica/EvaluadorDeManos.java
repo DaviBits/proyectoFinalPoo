@@ -1,7 +1,10 @@
 package Logica;
 
 import java.util.*;
-
+// esta clase te dice que tipo de jugada de poker tienes basado
+//en la mano que le des
+//casi todos sus métodos sirven para evaluar una mano
+//y asi decir que jugada tiene el jugador
 public class EvaluadorDeManos {
     private ArrayList<Carta> mano;
     private String jugadaMasAlta;
@@ -102,7 +105,7 @@ public class EvaluadorDeManos {
                 iguales++;
             }
         }
-        return iguales == 4; // Las otras 4 deben ser iguales al primero
+        return iguales == 4;
     }
 
 
@@ -115,12 +118,11 @@ public class EvaluadorDeManos {
         }
         Collections.sort(valores);
 
-        // Valores específicos para escalera real
-        return valores.equals(Arrays.asList(10, 11, 12, 13, 14)); // 10-J-Q-K-A
+        return valores.equals(Arrays.asList(10, 11, 12, 13, 14));
     }
 
     public boolean esEscaleraDeColor() {
-        return esColor() && esEscalera(); // Ya tienes esColor y luego definimos bien esEscalera
+        return esColor() && esEscalera();
     }
 
     public boolean esPoker() {
