@@ -1,9 +1,6 @@
 package Logica;
 
-import GUI.ControladorDeApuestas;
-import GUI.ControladorDelFlop;
-import GUI.PantallaDeReparto;
-import GUI.SelectorDeJugadores;
+import GUI.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -195,6 +192,33 @@ public class TexasHoldEm extends Poker {
         repaint();
     }
 
+    public void mostrarCartasComunitarias(){
+        MostradorCartasComunitarias mostradorCartasComunitarias=new MostradorCartasComunitarias(cartasComunitarias);
+        mostradorCartasComunitarias.setBounds(0, 0, 1000, 550);
+        add(mostradorCartasComunitarias);
+        JButton siguiente = new JButton("Siguiente");
+        siguiente.setBounds(400, 600, 150, 30);
+        siguiente.setVisible(true);
+        add(siguiente);
+        siguiente.addActionListener(e -> {
+            jugadorActualIndex++;
+            if (jugadorActualIndex < jugadores.size()) {
+                pantallaDeReparto.setBackground(Color.BLACK);
+                pantallaDeReparto.setJugador(jugadores.get(jugadorActualIndex));
+                revalidate();
+                repaint();
+            } else {
+                remove(pantallaDeReparto);
+                remove(siguiente);
+
+            }
+            repaint();
+        });
+        revalidate();
+        repaint();
+
+    }
+
 
     public void preFlop(){
         apuestaAIgualarIndividual=ciegaGrande;
@@ -261,7 +285,7 @@ public class TexasHoldEm extends Poker {
         for(int i=0; i<cartasComunitarias.size(); i++){
             cartasComunitarias.get(i).imprimirCarta();
         }
-        flopVisual("flop");
+        mostrarCartasComunitariasConDelay(() -> flopVisual("flop"));
     }
 
     public void flopVisual(String fase){
@@ -320,7 +344,7 @@ public class TexasHoldEm extends Poker {
                     System.out.println("Fin de las apuestas del " + fase + ". Total acumulado: " + apuestaTotal.get());
                     if (fase.equals("flop")) {
                         turn();
-                    } else if (fase.equals("Turn")) {
+                    } else if (fase.equals("turn")) {
                         river();
                     } // podrías agregar river() o showdown luego
                 }
@@ -350,7 +374,7 @@ public class TexasHoldEm extends Poker {
         this.huboApuestaEnFlop = false;
         this.yaSeMostroBotonApostarFlop = false;
 
-        flopVisual("Turn");
+        mostrarCartasComunitariasConDelay(() -> flopVisual("turn"));
 
 
     }
@@ -367,9 +391,27 @@ public class TexasHoldEm extends Poker {
         this.indiceJugadorFlop = 0;
         this.huboApuestaEnFlop = false;
         this.yaSeMostroBotonApostarFlop = false;
-
-        flopVisual("River");
+        mostrarCartasComunitariasConDelay(() -> flopVisual("river"));
     }
+
+    public void mostrarCartasComunitariasConDelay(Runnable siguienteFase) {
+        MostradorCartasComunitarias mostrador = new MostradorCartasComunitarias(cartasComunitarias);
+        mostrador.setBounds(0, 0, 1000, 550);
+        add(mostrador);
+        revalidate();
+        repaint();
+
+        // Esperar 3 segundos antes de pasar al flopVisual
+        Timer timer = new Timer(3000, e -> {
+            remove(mostrador);
+            revalidate();
+            repaint();
+            siguienteFase.run();
+        });
+        timer.setRepeats(false);
+        timer.start();
+    }
+
 
 
 
