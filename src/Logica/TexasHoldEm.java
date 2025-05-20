@@ -8,6 +8,8 @@ import java.lang.classfile.instruction.ReturnInstruction;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static javax.management.Query.or;
+
 public class TexasHoldEm extends Poker {
 
     private AtomicInteger apuestaTotal = new AtomicInteger(0);
@@ -22,10 +24,12 @@ public class TexasHoldEm extends Poker {
     private boolean huboApuestaEnFlop;
     private int indiceJugadorFlop;
     private boolean yaSeMostroBotonApostarFlop = false;
+    private int indiceJugadorShowdown;
 
 
     public TexasHoldEm(){
         super();
+        indiceJugadorShowdown=0;
         this.indiceJugadorFlop=0;
         this.huboApuestaEnFlop=false;
         cartasComunitarias= new ArrayList<>();
@@ -163,7 +167,7 @@ public class TexasHoldEm extends Poker {
             jugador.mostrarCartas();
         }
 
-        // Solo se crea una pantalla y se le pasa el primer jugador
+
         pantallaDeReparto = new PantallaDeReparto(jugadores.get(jugadorActualIndex));
         pantallaDeReparto.setBounds(0, 0, 1000, 550);
         add(pantallaDeReparto);
@@ -192,38 +196,10 @@ public class TexasHoldEm extends Poker {
         repaint();
     }
 
-    public void mostrarCartasComunitarias(){
-        MostradorCartasComunitarias mostradorCartasComunitarias=new MostradorCartasComunitarias(cartasComunitarias);
-        mostradorCartasComunitarias.setBounds(0, 0, 1000, 550);
-        add(mostradorCartasComunitarias);
-        JButton siguiente = new JButton("Siguiente");
-        siguiente.setBounds(400, 600, 150, 30);
-        siguiente.setVisible(true);
-        add(siguiente);
-        siguiente.addActionListener(e -> {
-            jugadorActualIndex++;
-            if (jugadorActualIndex < jugadores.size()) {
-                pantallaDeReparto.setBackground(Color.BLACK);
-                pantallaDeReparto.setJugador(jugadores.get(jugadorActualIndex));
-                revalidate();
-                repaint();
-            } else {
-                remove(pantallaDeReparto);
-                remove(siguiente);
-
-            }
-            repaint();
-        });
-        revalidate();
-        repaint();
-
-    }
-
-
     public void preFlop(){
         apuestaAIgualarIndividual=ciegaGrande;
         System.out.println("pre flop");
-        this.indiceJugadorEnPreFlop=0;
+        this.indiceJugadorEnPreFlop=2;
         mostrarTurnoPreFlop();
     }
 
@@ -325,10 +301,10 @@ public class TexasHoldEm extends Poker {
                 apuestaTotal.addAndGet(panelFlop.getFichasAgregadas());
                 if (panelFlop.huboSubida()) {
 
-                    this.apuestaAIgualarIndividual += panelFlop.getSubida();  // importante si hubo subida
-                    this.indiceJugadorFlop = 0; // todos deben volver a hablar
+                    this.apuestaAIgualarIndividual += panelFlop.getSubida();
+                    this.indiceJugadorFlop = 0;
                 } else {
-                    this.indiceJugadorFlop++; // se avanza normalmente al siguiente jugador
+                    this.indiceJugadorFlop++;
                 }
                 botonSiguiente.setEnabled(true);
                 if (panelFlop.elJugadorAposto()) {
@@ -346,7 +322,9 @@ public class TexasHoldEm extends Poker {
                         turn();
                     } else if (fase.equals("turn")) {
                         river();
-                    } // podrías agregar river() o showdown luego
+                    } else if (fase.equals("river")){
+                        enfrentamiento();
+                    }
                 }
 
             });
@@ -393,6 +371,101 @@ public class TexasHoldEm extends Poker {
         this.yaSeMostroBotonApostarFlop = false;
         mostrarCartasComunitariasConDelay(() -> flopVisual("river"));
     }
+
+    public void enfrentamiento() {
+        System.out.println("BATALLA FINAL");
+
+        while (indiceJugadorShowdown < jugadores.size()) {
+            Jugador jugador = jugadores.get(indiceJugadorShowdown);
+            if (jugador.haAbandonado()) {
+                indiceJugadorShowdown++;
+                continue;
+            }
+
+            removeAll();
+            JLabel nombre = new JLabel("Jugador: " + jugador.getNombre());
+            nombre.setBounds(50, 20, 300, 30);
+            nombre.setFont(new Font("Comic Sans MS", Font.BOLD, 18));
+            add(nombre);
+
+            JButton aceptarJugada = new JButton("Aceptar");
+            aceptarJugada.setBounds(400, 600, 150, 30);
+            aceptarJugada.setFont(new Font("Comic Sans MS", Font.BOLD, 14));
+            aceptarJugada.setEnabled(false);
+            add(aceptarJugada);
+
+            ArrayList<Carta> manoTotal = new ArrayList<>(jugador.getMano());
+            manoTotal.addAll(cartasComunitarias);
+
+
+            ArrayList<Carta> seleccionadas = new ArrayList<>();
+            int x = 50, y = 100;
+
+            for (Carta carta : manoTotal) {
+                JButton botonCarta = new JButton(new ImageIcon(carta.getImagen()));
+                botonCarta.setBounds(x, y, 80, 120);
+                botonCarta.setBackground(Color.WHITE);
+
+                botonCarta.addActionListener(e -> {
+                    if (seleccionadas.contains(carta)) {
+                        seleccionadas.remove(carta);
+                        botonCarta.setBorder(null);
+                    } else {
+                        if (seleccionadas.size() < 5) {
+                            seleccionadas.add(carta);
+                            botonCarta.setBorder(BorderFactory.createLineBorder(Color.RED, 3));
+                        }
+                    }
+                    aceptarJugada.setEnabled(seleccionadas.size() <= 5);
+                });
+
+                add(botonCarta);
+                x += 90;
+            }
+            aceptarJugada.addActionListener(e -> {
+                int suma = seleccionadas.stream()
+                        .mapToInt(carta -> carta.getValor())
+                        .sum();
+
+                String jugada= new EvaluadorDeManos(seleccionadas).evaluar();
+                int puntajeTotal=suma*getMultiplicador(jugada);
+                jugador.setPuntuacionFinal(puntajeTotal);
+                jugador.setJugadaFinal(jugada);
+                System.out.println("la jugada puesta fue: "+jugador.getJugadaFinal());
+                System.out.println("Puntos del jugador: "+jugador.getPuntuacionFinal());
+                indiceJugadorShowdown++;
+                enfrentamiento();
+            });
+
+            revalidate();
+            repaint();
+            return;
+        }
+        AnunciarGanador();
+
+    }
+
+    public void AnunciarGanador(){
+        removeAll();
+        int puntuacionMasAlta=0;
+        String nombreJugadorMasAlto="";
+        for(Jugador jugador: jugadores){
+            if(jugador.getPuntuacionFinal()>puntuacionMasAlta){
+                nombreJugadorMasAlto=jugador.getNombre();
+                puntuacionMasAlta=jugador.getPuntuacionFinal();
+            }
+        }
+        JLabel anuncioGanador=new JLabel("EL GANADOR ES: "+ nombreJugadorMasAlto);
+        anuncioGanador.setFont(new Font("Comic Sans MS", Font.BOLD, 36));
+        anuncioGanador.setBounds(150, 200, 800, 60);
+        add(anuncioGanador);
+        revalidate();
+        repaint();
+
+
+
+    }
+
 
     public void mostrarCartasComunitariasConDelay(Runnable siguienteFase) {
         MostradorCartasComunitarias mostrador = new MostradorCartasComunitarias(cartasComunitarias);

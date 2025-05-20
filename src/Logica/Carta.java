@@ -2,7 +2,7 @@ package Logica;
 
 import java.awt.image.BufferedImage;
 
-public class Carta {
+public class Carta implements Comparable <Carta>{
 
     private BufferedImage imagen;
     private int valor;
@@ -44,4 +44,27 @@ public class Carta {
     public void setImagen(BufferedImage imagen) {
         this.imagen = imagen;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Carta carta = (Carta) o;
+
+        return valor == carta.valor &&
+                palo.equals(carta.palo) &&
+                color.equals(carta.color);
+    }
+
+    @Override
+    public int compareTo(Carta otra) {
+        if (this.valor != otra.valor) {
+            return Integer.compare(this.valor, otra.valor);
+        } else {
+            return this.palo.compareTo(otra.palo); // ordena alfabéticamente si tienen mismo valor
+        }
+    }
+
+
 }

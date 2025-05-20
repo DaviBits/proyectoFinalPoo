@@ -14,6 +14,8 @@ public class Jugador {
     private int fichas;
     private boolean enJuego;
     private int fichasApostadas;
+    private String jugadaFinal;
+    private int puntuacionFinal;
 
 
 
@@ -32,9 +34,13 @@ public class Jugador {
         this.fichas=fichas;
         this.enJuego=true;
         this.fichasApostadas=0;
+        this.jugadaFinal="_";
+        this.puntuacionFinal=0;
     }
 
 
+    public void setJugadaFinal(String jugadaFinal){this.jugadaFinal=jugadaFinal;}
+    public String getJugadaFinal(){return jugadaFinal;}
     public boolean haAbandonado(){return !enJuego;}
     public int getFichasApostadas(){return fichasApostadas;}
     public void sumarFichasApostadas(int n){this.fichasApostadas+=n;}
@@ -71,9 +77,11 @@ public class Jugador {
         return puntuacionMano;
     }
 
-    public void setPuntuacionMano(int puntuacionMano) {
-        this.puntuacionMano = puntuacionMano;
-    }
+    public void setPuntuacionFinal(int puntuacion) {this.puntuacionFinal = puntuacion;}
+
+    public int getPuntuacionFinal(){return puntuacionFinal;}
+
+
 
     public void evaluarMano() {
         if (mano.size() != 5) {

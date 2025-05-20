@@ -66,9 +66,9 @@ public class ControladorDeApuestas extends JPanel {
 
         JLabel textoFichas=new JLabel("Tus Fichas disponibles son: "+jugador.getFichas());
         textoFichas.setFont(new Font("Comic Sans MS", Font.BOLD, 20));
-        textoFichas.setBounds(10,10, 100, 50);
+        textoFichas.setBounds(10,10, 200, 50);
         textoFichas.setVisible(true);
-        add(textoFichas);
+        //add(textoFichas);
 
 
         botonRetirarse= new JButton("retirarse");

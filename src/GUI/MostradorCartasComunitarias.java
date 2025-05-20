@@ -16,7 +16,7 @@ public class MostradorCartasComunitarias extends JPanel{
         setLayout(null);
         setBackground(Color.WHITE);
         labelCartasComunitarias = new JLabel("Cartas de comunitarias");
-        labelCartasComunitarias.setBounds(320, 175, 380, 65);
+        labelCartasComunitarias.setBounds(320, 10, 380, 65);
         labelCartasComunitarias.setFont(new Font("Comic Sans MS", Font.BOLD, 20));
         add(labelCartasComunitarias);
     }

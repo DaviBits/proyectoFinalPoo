@@ -16,7 +16,7 @@ public class PantallaDeReparto extends JPanel {
         setLayout(null);
         setBackground(Color.WHITE);
         labelJugadores = new JLabel("Cartas de; jugador "+jugador.getNombre());
-        labelJugadores.setBounds(320, 175, 380, 65);
+        labelJugadores.setBounds(320, 10, 380, 65);
         labelJugadores.setFont(new Font("Comic Sans MS", Font.BOLD, 20));
         add(labelJugadores);
 
@@ -28,7 +28,7 @@ public class PantallaDeReparto extends JPanel {
         remove(labelJugadores);
         setBackground(Color.WHITE);
         labelJugadores = new JLabel("Cartas de; jugador "+jugador.getNombre());
-        labelJugadores.setBounds(320, 175, 380, 65);
+        labelJugadores.setBounds(320, 10, 380, 65);
         labelJugadores.setFont(new Font("Comic Sans MS", Font.BOLD, 20));
         add(labelJugadores);
     }
