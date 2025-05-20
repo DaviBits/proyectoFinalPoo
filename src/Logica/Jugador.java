@@ -54,19 +54,9 @@ public class Jugador {
     public ArrayList<Carta> getMano() {
         return mano;
     }
-
-    public void setMano(ArrayList<Carta> mano) {
-        this.mano = mano;
-    }
-
     public String getNombre() {
         return nombre;
     }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
     public int getPuntuacionMano() {
         return puntuacionMano;
     }
@@ -203,4 +193,7 @@ public class Jugador {
     }
 
 
+    public int getPuntuacion() {
+        return puntuacionMano;
+    }
 }

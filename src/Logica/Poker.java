@@ -39,13 +39,7 @@ public abstract class Poker extends JPanel {
         mazo.eliminarCarta(cartaEliminada);
     }
 
-    public Carta tomarCarta(){
-        Carta cartaParaTomar= mazo.getCartaEn(mazo.getTamañoDellMazo()-1);
-        mazo.eliminarCarta(cartaParaTomar);
-        return cartaParaTomar;
-    }
 
-    public void mezclarMazo(){
-        mazo.barajarMazo();
-    }
+
+
 }
