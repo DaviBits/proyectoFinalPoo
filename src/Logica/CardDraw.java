@@ -660,7 +660,12 @@ public class CardDraw extends Poker {
         });
 
         btnVerGanador.addActionListener(e -> {
-           pantallaGanador();
+            if(hayEmpate()){
+                pantallaEmpate();
+            }
+            else {
+                pantallaGanador();
+            }
         });
 
         // Coordenadas para colocar las cartas visualmente
@@ -714,7 +719,29 @@ public class CardDraw extends Poker {
         revalidate();
         repaint();
     }
-    
+
+
+    public boolean hayEmpate() {
+
+        int mayorPuntuacion = -1; // Guarda la puntuación más alta encontrada
+        int cantidadConMayorPuntuacion = 0; // Cuenta cuántos jugadores tienen esa puntuación
+
+        // Recorre todos los jugadores para determinar el número de empates
+        for (JugadorCardDraw jugador : jugadores) {
+            int puntuacion = jugador.getPuntuacion();
+
+            if (puntuacion > mayorPuntuacion) {
+                // Se ha encontrado una nueva puntuación alta
+                mayorPuntuacion = puntuacion;
+                cantidadConMayorPuntuacion = 1; // Reinicia el contador
+            } else if (puntuacion == mayorPuntuacion) {
+                // Otro jugador tiene la misma puntuación alta
+                cantidadConMayorPuntuacion++;
+            }
+        }
+        return cantidadConMayorPuntuacion > 1;
+    }
+
     // Muestra el ganador o si hay empate
     public JugadorCardDraw getJugadorConMasPuntuacion() {
         if (jugadores == null || jugadores.isEmpty()) {
@@ -731,6 +758,57 @@ public class CardDraw extends Poker {
 
         return mejorJugador;
     }
+    public void pantallaEmpate() {
+        limpiarPanel();
+
+        // Obtener la mayor puntuación
+        int mayorPuntuacion = -1;
+        for (JugadorCardDraw jugador : jugadores) {
+            if (jugador.getPuntuacion() > mayorPuntuacion) {
+                mayorPuntuacion = jugador.getPuntuacion();
+            }
+        }
+        // Obtener los jugadores empatados
+        ArrayList<Integer> indicesEmpatados = new ArrayList<>();
+        for (int i = 0; i < jugadores.size(); i++) {
+            if (jugadores.get(i).getPuntuacion() == mayorPuntuacion) {
+                indicesEmpatados.add(i);
+            }
+        }
+
+        // Calcular apuesta dividida
+        int apuestaPorJugador = apuestaTotal / indicesEmpatados.size();
+
+        // Título
+        JLabel titulo = new JLabel("¡Hay un empate!");
+        titulo.setFont(new Font("Comic Sans MS", Font.BOLD, 24));
+        titulo.setBounds(10, 20, 400, 30);
+        add(titulo);
+
+        // Mostrar info de cada jugador empatado
+        int y = 70; // posición vertical inicial
+        for (int i = 0; i < indicesEmpatados.size(); i++) {
+            int indice = indicesEmpatados.get(i);
+            JugadorCardDraw jugador = jugadores.get(indice);
+
+            JLabel info = new JLabel("Jugador #" + (indice + 1) + " - Jugada: "
+                    + jugador.getNombreJugada() + " Recibe " + apuestaPorJugador + " unidades.");
+            info.setFont(new Font("Comic Sans MS", Font.PLAIN, 16));
+            info.setBounds(10, y, 700, 25);
+            add(info);
+            y += 30; // espacio entre líneas
+        }
+
+        // Botón para salir
+        JButton btnSalir = new JButton("Salir");
+        btnSalir.setBounds(220, y + 20, 100, 30);
+        add(btnSalir);
+        btnSalir.addActionListener(e -> System.exit(0));
+
+        revalidate();
+        repaint();
+    }
+
     public void pantallaGanador() {
         // Limpiar la pantalla
         limpiarPanel();
@@ -759,22 +837,6 @@ public class CardDraw extends Poker {
         infoGanador.setFont(new Font("Comic Sans MS", Font.PLAIN, 18));
         infoGanador.setBounds(10, 70, 600, 25);
         add(infoGanador);
-
-        // Botón para reiniciar el juego
-        JButton btnReiniciar = new JButton("Jugar de nuevo");
-        btnReiniciar.setBounds(10, 120, 200, 30);
-        add(btnReiniciar);
-
-        btnReiniciar.addActionListener(e -> {
-            jugadores.clear();
-            jugadorActual = 0;
-            apuestaMayor = 0;
-            apuestaTotal = 0;
-            segundaRondaDeApuesta = false;
-            inicializarJugadores();
-            revalidate();
-            repaint();
-        });
 
         // Botón para salir del juego
         JButton btnSalir = new JButton("Salir");
